@@ -1,0 +1,3107 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>向阳堡乡退役军人服务站信息管理系统</title>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style>
+:root{
+  --pri:#1652a8; --pri-d:#0f3d80; --pri-l:#e9f1fd; --pri-l2:#f4f8fe;
+  --bg:#eef1f6; --card:#ffffff; --bd:#e2e7ef; --bd2:#eef1f6;
+  --tx:#1e2430; --tx2:#5b6472; --tx3:#939ba8;
+  --red:#d92d20; --red-l:#fdecea; --amber:#c98a00; --amber-l:#fdf5e3;
+  --blue:#2a7de1; --blue-l:#eaf2fd; --green:#0f9d58; --green-l:#e8f7ef;
+  --r:10px; --sh:0 1px 3px rgba(20,35,70,.06),0 6px 18px rgba(20,35,70,.05);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  background:var(--bg); color:var(--tx); font-size:14px; line-height:1.6;
+}
+button,input,select,textarea{font-family:inherit;font-size:14px;color:inherit}
+button{cursor:pointer;border:none;background:none}
+a{color:var(--pri);text-decoration:none}
+.hide{display:none !important}
+
+.wrap{max-width:1200px;margin:0 auto;padding:0 16px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:var(--r);box-shadow:var(--sh)}
+.mt12{margin-top:12px}.mt16{margin-top:16px}.mt20{margin-top:20px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.spacer{flex:1}
+.muted{color:var(--tx2)}.muted3{color:var(--tx3)}
+.tiny{font-size:12px}
+.center{text-align:center}
+
+/* ---------- 通用按钮 ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  height:34px;padding:0 14px;border-radius:8px;border:1px solid var(--bd);
+  background:#fff;color:var(--tx);font-size:13px;white-space:nowrap;transition:.15s}
+.btn:hover{border-color:#c9d3e2;background:#fafbfd}
+.btn:active{transform:translateY(1px)}
+.btn.pri{background:var(--pri);border-color:var(--pri);color:#fff}
+.btn.pri:hover{background:var(--pri-d);border-color:var(--pri-d)}
+.btn.danger{background:#fff;border-color:#f0bdb7;color:var(--red)}
+.btn.danger:hover{background:var(--red-l)}
+.btn.warn{background:#fff;border-color:#f0d79a;color:var(--amber)}
+.btn.warn:hover{background:var(--amber-l)}
+.btn.ghost{background:transparent;border-color:transparent;color:var(--tx2)}
+.btn.ghost:hover{background:#f1f4f9}
+.btn.sm{height:28px;padding:0 10px;font-size:12px;border-radius:6px}
+.btn.block{width:100%}
+.btn[disabled]{opacity:.45;pointer-events:none}
+
+/* ---------- 表单控件 ---------- */
+label.fl{display:block;font-size:12px;color:var(--tx2);margin-bottom:5px}
+label.fl .req{color:var(--red);margin-left:2px}
+.inp,select.inp,textarea.inp{
+  width:100%;height:36px;padding:0 11px;border:1px solid var(--bd);border-radius:8px;
+  background:#fff;outline:none;transition:.15s}
+textarea.inp{height:auto;padding:8px 11px;resize:vertical;line-height:1.6}
+.inp:focus{border-color:var(--pri);box-shadow:0 0 0 3px rgba(22,82,168,.10)}
+.inp:disabled,.inp[readonly]{background:#f5f7fa;color:var(--tx2)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media(max-width:720px){.grid2,.grid3{grid-template-columns:1fr}}
+
+/* ---------- 顶部栏 ---------- */
+.topbar{position:sticky;top:0;z-index:60;background:rgba(255,255,255,.94);backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--bd)}
+.topbar .in{max-width:1200px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:12px}
+.brand{display:flex;align-items:center;gap:10px;min-width:0}
+.emblem{width:34px;height:34px;border-radius:9px;flex:none;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(150deg,#1b3a5f,#0f2138);box-shadow:inset 0 0 0 1px rgba(201,162,39,.55)}
+.emblem svg{width:21px;height:21px;display:block}
+.brand b{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.brand span{font-size:11px;color:var(--tx3);display:block;line-height:1.2}
+.who{font-size:12px;color:var(--tx2);text-align:right;line-height:1.35;flex:none}
+.who b{color:var(--tx);font-weight:600}
+.tag{display:inline-block;padding:1px 7px;border-radius:20px;font-size:11px;line-height:16px}
+.tag.town{background:#e9f1fd;color:var(--pri)}
+.tag.vil{background:#e8f7ef;color:var(--green)}
+.topbar .in.nav{padding-top:0;padding-bottom:9px;gap:5px;overflow-x:auto}
+.nv{height:30px;padding:0 13px;border-radius:7px;font-size:13px;color:var(--tx2);white-space:nowrap;flex:none;transition:.14s}
+.nv:hover{background:#f1f4f9;color:var(--tx)}
+.nv.on{background:var(--pri-l);color:var(--pri);font-weight:600}
+.nv .cnt{display:inline-block;min-width:16px;height:16px;line-height:16px;padding:0 4px;border-radius:8px;
+  background:var(--red);color:#fff;font-size:10px;text-align:center;margin-left:5px;vertical-align:1px;font-weight:400}
+
+/* ---------- 看板 / 图表 ---------- */
+.panels{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:900px){.panels{grid-template-columns:1fr}}
+.panel{background:#fff;border:1px solid var(--bd);border-radius:var(--r);box-shadow:var(--sh);padding:16px 18px}
+.panel h3{margin:0 0 14px;font-size:13.5px;font-weight:600;display:flex;align-items:center;gap:8px}
+.panel h3:before{content:"";width:3px;height:14px;border-radius:2px;background:var(--pri)}
+.panel h3 .more{margin-left:auto;font-size:12px;font-weight:400;color:var(--tx3)}
+.bars{display:flex;flex-direction:column;gap:7px}
+.bar{display:grid;grid-template-columns:104px 1fr 72px;gap:10px;align-items:center;font-size:12.5px}
+.bar .bl{color:var(--tx2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar .bt{height:14px;background:#f1f4f9;border-radius:7px;overflow:hidden}
+.bar .bt i{display:block;height:100%;border-radius:7px;transition:width .5s cubic-bezier(.2,.7,.3,1)}
+.bar .bv{text-align:right;font-variant-numeric:tabular-nums;color:var(--tx)}
+.bar .bv u{text-decoration:none;color:var(--tx3);font-size:11px;margin-left:3px}
+.donut-wrap{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.legend{display:flex;flex-direction:column;gap:7px;font-size:12.5px;flex:1;min-width:150px}
+.legend .lg{display:flex;align-items:center;gap:8px}
+.legend .lg i{width:10px;height:10px;border-radius:3px;flex:none}
+.legend .lg .n{flex:1;color:var(--tx2)}
+.legend .lg .v{font-variant-numeric:tabular-nums}
+
+/* ---------- 预警记录 ---------- */
+.wlist{display:flex;flex-direction:column;gap:10px}
+.witem{border:1px solid var(--bd);border-radius:var(--r);background:#fff;padding:13px 15px;box-shadow:var(--sh)}
+.witem.un{border-left:3px solid var(--red)}
+.witem.hd{border-left:3px solid var(--green)}
+.witem .wh{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:8px}
+.witem .wh b{font-size:13.5px}
+.witem .wt{font-size:11.5px;color:var(--tx3);font-family:ui-monospace,Consolas,monospace;margin-left:auto}
+.witem .wc{background:#f4f8fe;border:1px solid #cfe0f8;border-radius:8px;padding:9px 12px;
+  font-size:12.5px;color:#123f86;line-height:1.8;word-break:break-all}
+.witem .wf{display:flex;gap:8px;align-items:center;margin-top:9px;flex-wrap:wrap}
+.witem .wnote{font-size:12px;color:var(--tx2);background:#f7f9fc;border-radius:7px;padding:6px 10px;flex:1;min-width:160px}
+
+/* ---------- 数据管理 ---------- */
+.dgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px}
+.dcard{border:1px solid var(--bd);border-radius:var(--r);padding:16px;background:#fff;box-shadow:var(--sh);
+  display:flex;flex-direction:column}
+.dcard h4{margin:0 0 6px;font-size:13.5px;font-weight:600}
+.dcard p{margin:0 0 14px;font-size:12.5px;color:var(--tx2);line-height:1.75;flex:1}
+
+/* ---------- 登录页 · 荣誉墙 ---------- */
+.lg2{position:relative;min-height:100vh;display:grid;grid-template-columns:1.12fr .88fr;
+  background:
+    radial-gradient(1200px 680px at 14% -12%,#1e3a5f 0%,transparent 60%),
+    radial-gradient(900px 600px at 92% 112%,#17324f 0%,transparent 58%),
+    linear-gradient(158deg,#0a1421 0%,#0e1d31 46%,#09121d 100%)}
+.lg2:before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.55;
+  background-image:
+    repeating-linear-gradient(45deg,rgba(255,255,255,.030) 0 1px,transparent 1px 4px),
+    repeating-linear-gradient(-45deg,rgba(255,255,255,.020) 0 1px,transparent 1px 5px)}
+.lg2:after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(125% 95% at 50% 44%,transparent 38%,rgba(0,0,0,.62) 100%)}
+.lg2>*{position:relative;z-index:2}
+
+.honor{display:flex;align-items:center;padding:56px 64px;overflow:hidden;position:relative}
+.honor:before,.honor:after{content:"";position:absolute;width:48px;height:48px;
+  border:1px solid rgba(201,162,39,.45);pointer-events:none}
+.honor:before{left:32px;top:32px;border-right:none;border-bottom:none}
+.honor:after{right:32px;bottom:32px;border-left:none;border-top:none}
+.honor-inner{max-width:520px;position:relative;z-index:2}
+.starwm{position:absolute;left:-104px;bottom:-128px;width:540px;height:540px;opacity:.07;pointer-events:none}
+.starwm path{fill:none;stroke:#e8d7a4;stroke-width:1.1}
+.starwm circle{fill:none;stroke:#e8d7a4;stroke-width:.7}
+.honor-emblem{width:64px;height:64px;margin-bottom:26px;position:relative}
+.honor-emblem svg{width:100%;height:100%;display:block;position:relative;z-index:1}
+.honor-emblem:after{content:"";position:absolute;inset:-18px;border-radius:50%;pointer-events:none;
+  background:radial-gradient(circle,rgba(201,162,39,.20),transparent 68%)}
+.honor-title{font-family:"Songti SC","STSong","Source Han Serif SC","Noto Serif SC","SimSun",serif;
+  font-size:36px;line-height:1.44;font-weight:700;letter-spacing:.07em;color:#f4ecd8;margin:0;
+  text-shadow:0 2px 20px rgba(0,0,0,.55)}
+.honor-rule{display:flex;align-items:center;gap:10px;margin:20px 0 14px}
+.honor-rule span{height:1px;flex:1;background:linear-gradient(90deg,rgba(201,162,39,.78),rgba(201,162,39,.10))}
+.honor-rule span:last-child{background:linear-gradient(90deg,rgba(201,162,39,.10),rgba(201,162,39,.78))}
+.honor-rule i{color:#c9a227;font-size:9px;font-style:normal}
+.honor-sub{font-family:"KaiTi","STKaiti","Kaiti SC",serif;font-size:15px;color:#b9c6d8;margin:0 0 28px;letter-spacing:.18em}
+.honor-list{list-style:none;margin:0;padding:0}
+.honor-list li{position:relative;padding:11px 0 11px 24px;font-size:13.5px;color:#c6d1e0;
+  letter-spacing:.02em;border-bottom:1px dashed rgba(201,162,39,.17)}
+.honor-list li:last-child{border-bottom:none}
+.honor-list li:before{content:"";position:absolute;left:2px;top:17px;width:7px;height:7px;
+  background:#c9a227;transform:rotate(45deg);box-shadow:0 0 8px rgba(201,162,39,.6)}
+.honor-list b{color:#f0d98a;font-weight:600}
+.honor-foot{margin-top:32px;display:flex;align-items:center;gap:12px}
+.honor-foot .rb{width:3px;height:30px;background:linear-gradient(180deg,#c9a227,#7d6415);border-radius:2px}
+.honor-foot p{margin:0;font-family:"KaiTi","STKaiti",serif;font-size:15px;letter-spacing:.34em;color:#d9c489}
+
+.lg2-form{display:flex;align-items:center;justify-content:center;padding:40px 48px}
+.card-in{width:100%;max-width:400px;position:relative;border-radius:4px;padding:30px 28px 24px;
+  background:linear-gradient(180deg,#fbf7ee,#f3ecdc);
+  border:1px solid rgba(201,162,39,.42);
+  box-shadow:0 34px 80px -22px rgba(0,0,0,.74),inset 0 0 0 1px rgba(255,255,255,.5)}
+.card-in:before{content:"";position:absolute;left:0;right:0;top:0;height:4px;border-radius:4px 4px 0 0;
+  background:linear-gradient(90deg,#0f2138,#1b3a5f 22%,#c9a227 50%,#1b3a5f 78%,#0f2138)}
+.card-in:after{content:"";position:absolute;inset:0;border-radius:4px;pointer-events:none;opacity:.5;
+  background-image:repeating-linear-gradient(0deg,rgba(120,100,60,.030) 0 1px,transparent 1px 3px)}
+.card-head{display:flex;gap:12px;align-items:center;margin-bottom:22px;position:relative}
+.seal{width:36px;height:36px;flex:none}
+.seal svg{width:100%;height:100%;display:block}
+.card-head h2{margin:0;font-family:"Songti SC","STSong","SimSun",serif;font-size:20px;font-weight:700;
+  letter-spacing:.16em;color:#20283a}
+.card-head p{margin:3px 0 0;font-size:11.5px;color:#8b8265;letter-spacing:.04em}
+.lgf{margin-bottom:15px;position:relative}
+.lgf label{display:block;font-family:"KaiTi","STKaiti",serif;font-size:12.5px;color:#8a7c58;
+  letter-spacing:.16em;margin-bottom:1px}
+.lgf label .req{color:#b03a2e}
+.lg-inp{width:100%;height:36px;background:transparent;border:none;border-bottom:1.5px solid #d5c9ac;
+  padding:0 2px;font-size:14.5px;color:#232a38;outline:none;border-radius:0;
+  transition:border-color .2s,box-shadow .2s}
+.lg-inp::placeholder{color:#b3a98f}
+.lg-inp:focus{border-bottom-color:#b08a1e;box-shadow:0 8px 14px -12px rgba(176,138,30,.9)}
+.btn-login{width:100%;height:46px;margin-top:6px;border-radius:5px;border:1px solid #c9a227;
+  background:linear-gradient(180deg,#1d3557,#12233c);color:#f2e3b8;font-size:15px;font-weight:500;
+  letter-spacing:.5em;text-indent:.5em;cursor:pointer;
+  box-shadow:0 14px 28px -14px rgba(10,25,50,.95),inset 0 1px 0 rgba(255,255,255,.10);transition:.18s}
+.btn-login:hover{background:linear-gradient(180deg,#24406a,#162b4a);letter-spacing:.6em}
+.btn-login:active{transform:translateY(1px)}
+.lg-hint{margin:13px 0 0;text-align:center;font-size:11.5px;color:#8b8265;letter-spacing:.03em}
+.lg-hint b{color:#8a6a12}
+.roster{margin-top:18px;border-top:1px solid rgba(140,120,70,.22);padding-top:12px}
+.roster .rt{font-size:11.5px;color:#8b8265;letter-spacing:.1em;margin-bottom:7px;display:flex;align-items:center;gap:8px}
+.roster .rt:after{content:"";flex:1;height:1px;background:rgba(140,120,70,.22)}
+.roster-note{font-size:11.5px;line-height:1.7;color:#7a7259;margin-bottom:8px;padding:7px 10px;
+  background:rgba(201,162,39,.10);border-left:2px solid rgba(176,58,46,.55);border-radius:0 3px 3px 0}
+.roster-note b{color:#b03a2e}
+.roster-list{max-height:160px;overflow:auto;border:1px solid rgba(140,120,70,.20);border-radius:4px;
+  background:rgba(255,255,255,.45)}
+.rw{display:flex;align-items:center;gap:9px;height:32px;padding:0 10px;font-size:12px;cursor:pointer;
+  border-bottom:1px solid rgba(140,120,70,.14);transition:.14s}
+.rw:last-child{border-bottom:none}
+.rw:hover{background:rgba(201,162,39,.14)}
+.rw .nm{width:58px;font-weight:600;color:#2a3140}
+.rw .ph{width:104px;font-family:ui-monospace,Consolas,monospace;color:#4c5464}
+.rw .vg{flex:1;color:#8b8265;font-size:11.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rw .lv{font-size:10.5px;padding:0 6px;border-radius:2px;line-height:16px;border:1px solid;flex:none}
+.rw .lv.town{color:#8a6a12;border-color:rgba(176,138,30,.6);background:rgba(201,162,39,.16)}
+.rw .lv.vil{color:#3f5f42;border-color:rgba(90,130,95,.5);background:rgba(120,160,120,.16)}
+
+@keyframes lgRise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+.honor-inner>*{animation:lgRise .75s cubic-bezier(.2,.7,.3,1) both}
+.honor-inner>*:nth-child(1){animation-delay:.04s}
+.honor-inner>*:nth-child(2){animation-delay:.12s}
+.honor-inner>*:nth-child(3){animation-delay:.20s}
+.honor-inner>*:nth-child(4){animation-delay:.28s}
+.honor-inner>*:nth-child(5){animation-delay:.36s}
+.honor-inner>*:nth-child(6){animation-delay:.44s}
+.card-in{animation:lgRise .85s .22s cubic-bezier(.2,.7,.3,1) both}
+@media(prefers-reduced-motion:reduce){.honor-inner>*,.card-in{animation:none}}
+@media(max-width:960px){
+  .lg2{grid-template-columns:1fr}
+  .honor{padding:38px 28px 6px;align-items:flex-start}
+  .honor:before{left:14px;top:14px;width:34px;height:34px}
+  .honor:after{display:none}
+  .honor-title{font-size:25px}
+  .honor-list li{font-size:13px;padding-top:8px;padding-bottom:8px}
+  .honor-foot{margin-top:18px}
+  .starwm{display:none}
+  .lg2-form{padding:20px 18px 42px}
+  .card-in{max-width:520px}
+  .roster-list{max-height:192px}
+}
+
+/* ---------- 统计卡 ---------- */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px}
+.stat{background:#fff;border:1px solid var(--bd);border-radius:var(--r);padding:14px 16px;box-shadow:var(--sh)}
+.stat .k{font-size:12px;color:var(--tx2);display:flex;align-items:center;gap:6px}
+.stat .v{font-size:24px;font-weight:600;line-height:1.35;letter-spacing:.3px}
+.stat .u{font-size:12px;color:var(--tx3);margin-left:3px;font-weight:400}
+.dot{width:8px;height:8px;border-radius:50%;flex:none}
+.d-blue{background:var(--pri)}.d-red{background:var(--red)}.d-amber{background:var(--amber)}
+.d-green{background:var(--green)}.d-gray{background:#9aa4b2}
+
+/* ---------- 地图 ---------- */
+.map-wrap{position:relative;background:#fff;border:1px solid var(--bd);border-radius:var(--r);box-shadow:var(--sh);
+  padding:8px;max-width:1100px;margin:0 auto}
+.map-svg{width:100%;height:auto;display:block;touch-action:manipulation}
+.vcell{cursor:pointer}
+.vcell:hover .vdot{filter:brightness(.9)}
+.vcell.dis{cursor:not-allowed}
+.vcell.dis .vdot{filter:saturate(.35)}
+.vnum{font-size:12.5px;font-weight:700;pointer-events:none;user-select:none;
+  font-family:"DIN Alternate","Bahnschrift",system-ui,sans-serif}
+.vbadge{font-size:10px;font-weight:700;pointer-events:none;user-select:none;
+  font-family:"DIN Alternate","Bahnschrift",system-ui,sans-serif}
+.vlabel{font-size:12.5px;font-weight:600;pointer-events:none;user-select:none;
+  paint-order:stroke;stroke:#fbf4e4;stroke-width:3px;stroke-linejoin:round}
+/* 底图地名（自然村）：浅灰斜体小字，权重低于行政村村名 */
+.nlabel{font-size:10px;font-style:italic;font-weight:400;fill:#aab2bf;letter-spacing:.3px;
+  pointer-events:none;user-select:none;
+  paint-order:stroke;stroke:#fbf4e4;stroke-width:2.8px;stroke-linejoin:round}
+.govlabel{font-size:10.5px;font-weight:700;fill:#b03a2e;pointer-events:none;user-select:none;
+  paint-order:stroke;stroke:#fbf4e4;stroke-width:3px;stroke-linejoin:round}
+.map-legend{display:flex;gap:16px;flex-wrap:wrap;align-items:center;padding:8px 10px;font-size:12px;color:var(--tx2)}
+.map-legend i{display:inline-block;width:22px;height:10px;border-radius:2px;margin-right:5px;vertical-align:middle;border:1px solid rgba(0,0,0,.06)}
+.hover-tip{position:absolute;pointer-events:none;background:rgba(25,32,45,.94);color:#fff;font-size:12px;
+  padding:7px 10px;border-radius:7px;line-height:1.65;white-space:nowrap;z-index:20;opacity:0;transition:opacity .12s}
+.hover-tip.on{opacity:1}
+
+/* ---------- 表格 ---------- */
+.tbl-wrap{overflow:auto;border:1px solid var(--bd);border-radius:var(--r);background:#fff}
+table.tbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;min-width:1180px}
+table.tbl th,table.tbl td{padding:9px 10px;text-align:left;border-bottom:1px solid var(--bd2);white-space:nowrap}
+table.tbl thead th{background:#f7f9fc;color:var(--tx2);font-weight:600;font-size:12px;position:sticky;top:0;z-index:2}
+table.tbl tbody tr:hover{background:#fafcff}
+table.tbl tbody tr:last-child td{border-bottom:none}
+.risk-th .rl{display:inline-block;padding:0 5px;border-radius:4px;font-size:10px;line-height:15px;margin-left:3px;color:#fff;font-weight:400}
+.rl1{background:var(--red)}.rl2{background:var(--amber)}.rl3{background:var(--blue)}
+.badge{display:inline-block;padding:1px 8px;border-radius:20px;font-size:11px;line-height:17px;border:1px solid}
+.b1{background:var(--red-l);color:var(--red);border-color:#f3c3bd}
+.b2{background:var(--amber-l);color:var(--amber);border-color:#efdca6}
+.b3{background:var(--blue-l);color:var(--blue);border-color:#c3daf7}
+.bg{background:var(--green-l);color:var(--green);border-color:#b9e3cb}
+.bgray{background:#f2f4f7;color:var(--tx2);border-color:#e0e5ed}
+.ops{display:flex;gap:4px}
+.pager{display:flex;align-items:center;gap:8px;justify-content:flex-end;padding:10px 4px;font-size:12px;color:var(--tx2);flex-wrap:wrap}
+.pager .pg{min-width:30px;height:28px;border:1px solid var(--bd);border-radius:6px;background:#fff;font-size:12px}
+.pager .pg.on{background:var(--pri);border-color:var(--pri);color:#fff}
+
+/* ---------- 弹层 ---------- */
+.mask{position:fixed;inset:0;background:rgba(18,26,40,.45);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px}
+.modal{background:#fff;border-radius:12px;width:100%;max-width:640px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(10,20,40,.3)}
+.modal.wide{max-width:860px}
+.modal .mh{padding:15px 18px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:10px}
+.modal .mh b{font-size:15px;font-weight:600}
+.modal .mb{padding:18px;overflow:auto}
+.modal .mf{padding:12px 18px;border-top:1px solid var(--bd);display:flex;gap:10px;justify-content:flex-end;background:#fbfcfe}
+.x{width:28px;height:28px;border-radius:7px;color:var(--tx3);font-size:17px;line-height:1}
+.x:hover{background:#f1f4f9;color:var(--tx)}
+
+/* ---------- 分区标题 ---------- */
+.sect{margin:18px 0 10px;padding-left:10px;border-left:3px solid var(--pri);font-size:13px;font-weight:600;color:var(--tx)}
+.sect:first-child{margin-top:0}
+
+/* ---------- 家庭成员/联系记录 ---------- */
+.sub-item{border:1px solid var(--bd);border-radius:9px;padding:12px;background:#fbfcfe;margin-bottom:10px;position:relative}
+.sub-item .del{position:absolute;right:8px;top:8px}
+.photos{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.photos .ph{width:76px;height:76px;border-radius:8px;overflow:hidden;border:1px solid var(--bd);position:relative;background:#f2f4f7}
+.photos .ph img{width:100%;height:100%;object-fit:cover;display:block}
+.photos .ph .rm{position:absolute;right:2px;top:2px;width:18px;height:18px;border-radius:5px;background:rgba(0,0,0,.55);color:#fff;font-size:12px;line-height:18px;text-align:center}
+.uploader{width:76px;height:76px;border:1px dashed #c4cddb;border-radius:8px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;color:var(--tx3);font-size:11px;gap:2px;background:#fff}
+.uploader:hover{border-color:var(--pri);color:var(--pri)}
+
+/* ---------- 备注框 ---------- */
+.notebox{background:#fffdf5;border:1px solid #f0e3bd;border-radius:var(--r);padding:12px 14px}
+.notebox .nt{font-size:12px;color:#8a6d1f;font-weight:600;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.notebox textarea{background:#fff;border-color:#eadfbc}
+
+/* ---------- toast ---------- */
+#toasts{position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:500;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none}
+.toast{background:rgba(25,32,45,.95);color:#fff;font-size:13px;padding:9px 16px;border-radius:9px;box-shadow:0 8px 24px rgba(0,0,0,.2);max-width:88vw}
+.toast.ok{background:#0f7a45}.toast.err{background:#b3261e}
+
+/* ---------- 详情展示 ---------- */
+.kv{display:grid;grid-template-columns:110px 1fr;gap:6px 12px;font-size:13px}
+.kv .k{color:var(--tx2);font-size:12px}
+.kv .v{word-break:break-all}
+.empty{padding:48px 16px;text-align:center;color:var(--tx3);font-size:13px}
+.filters{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.acc-list{max-height:280px;overflow:auto;border:1px solid var(--bd);border-radius:9px}
+.acc-row{display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px solid var(--bd2);font-size:12px;cursor:pointer}
+.acc-row:last-child{border-bottom:none}
+.acc-row:hover{background:var(--pri-l2)}
+.acc-row .nm{width:74px;font-weight:500}
+.acc-row .ph{width:112px;color:var(--tx2);font-family:ui-monospace,Consolas,monospace}
+.acc-row .vg{flex:1;color:var(--tx3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pw{font-family:ui-monospace,Consolas,monospace}
+
+/* ============================================================
+   以下为《改动需求文档》对应新增样式
+   ============================================================ */
+
+/* ---------- 需求 1：地图页标题（深色荣誉底 + 动态人数） ---------- */
+.pagehead{margin-top:16px;padding:16px 20px 17px;border-radius:var(--r);position:relative;overflow:hidden;
+  border:1px solid #1b3a5f;box-shadow:var(--sh);
+  background:linear-gradient(115deg,#0d1c30 0%,#17304f 58%,#1e4166 100%)}
+.pagehead:before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.5;
+  background-image:repeating-linear-gradient(45deg,rgba(255,255,255,.028) 0 1px,transparent 1px 4px)}
+.pagehead:after{content:"";position:absolute;right:-50px;top:-72px;width:230px;height:230px;border-radius:50%;
+  background:radial-gradient(circle,rgba(201,162,39,.20),transparent 70%);pointer-events:none}
+.pagehead h1{margin:0;position:relative;font-family:"Songti SC","STSong","Source Han Serif SC","Noto Serif SC","SimSun",serif;
+  font-size:21px;line-height:1.4;font-weight:700;letter-spacing:.10em;color:#f4ecd8;
+  text-shadow:0 2px 14px rgba(0,0,0,.5)}
+.pagehead .ph-sub{margin:9px 0 0;position:relative;font-size:12.5px;color:#b9c6d8;letter-spacing:.03em}
+.pagehead .ph-sub b{font-family:"DIN Alternate","Bahnschrift",system-ui,sans-serif;font-size:15px;
+  font-weight:700;color:#f0d98a;margin:0 3px;letter-spacing:0}
+.pagehead .ph-sub .sep{color:rgba(201,162,39,.55);margin:0 9px}
+
+/* ---------- 需求 2：地图画布压暗，突出乡域轮廓 ---------- */
+.map-wrap{background:#16202f;border-color:#26364d}
+.map-legend{background:#f7f9fc;border-radius:8px;margin-bottom:8px}
+
+/* ---------- 需求 3：1 级风险仅「风险防控等级」单元格标红 ---------- */
+td.risk-hit{background:var(--red-l);border-left:2px solid var(--red);border-right:2px solid #f3c3bd}
+td.risk-hit .badge{background:#fbd8d4;color:#b3261e;border-color:#e9a79f;font-weight:600}
+.b0{background:#f2f4f7;color:var(--tx2);border-color:#e0e5ed}
+
+/* ---------- 需求 4：基本信息区右侧人员照片 ---------- */
+.basic{display:grid;grid-template-columns:1fr 136px;gap:18px;align-items:start}
+@media(max-width:720px){.basic{grid-template-columns:1fr}}
+.idphoto .frame{width:136px;height:174px;border:1px dashed #c4cddb;border-radius:9px;background:#f7f9fc;
+  display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}
+.idphoto .frame.has{border-style:solid;border-color:var(--bd);background:#eef1f6}
+.idphoto .frame img{width:100%;height:100%;object-fit:cover;display:block;cursor:zoom-in}
+.idphoto .frame .ph-empty{font-size:11.5px;color:var(--tx3);text-align:center;line-height:1.75;padding:0 12px}
+.idphoto .cap{font-size:11.5px;color:var(--tx3);text-align:center;margin-top:7px}
+.idphoto .acts{display:flex;gap:6px;margin-top:8px}
+.idphoto .acts .btn{flex:1;padding:0 4px}
+
+/* ---------- 需求 6：照片点击放大 ---------- */
+.photos .ph img{cursor:zoom-in}
+
+/* ---------- 全乡人员列表：快捷筛选标签 ---------- */
+.chips{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.chip{height:28px;padding:0 13px;border-radius:14px;border:1px solid var(--bd);background:#fff;
+  font-size:12px;color:var(--tx2);transition:.14s}
+.chip:hover{border-color:#c9d3e2}
+.chip.on{background:var(--pri-l);border-color:#c3daf7;color:var(--pri);font-weight:600}
+
+/* ---------- 看板统计卡可点击跳转 ---------- */
+.stat.click{cursor:pointer;transition:.15s}
+.stat.click:hover{border-color:#c3daf7;box-shadow:0 5px 16px rgba(20,35,70,.11);transform:translateY(-1px)}
+.stat.click:active{transform:none}
+.stat .jump{font-size:11px;color:var(--tx3);font-weight:400;margin-left:auto}
+.stat.click:hover .jump{color:var(--pri)}
+
+/* ---------- 来访诉求 / 七包一 ---------- */
+.vstat{display:flex;flex-direction:column;gap:7px}
+.vstat .vs{display:grid;grid-template-columns:96px 1fr 62px;gap:10px;align-items:center;font-size:12.5px}
+.vstat .vs .n{color:var(--tx2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.vstat .vs .t{height:12px;background:#f1f4f9;border-radius:6px;overflow:hidden}
+.vstat .vs .t i{display:block;height:100%;border-radius:6px;background:var(--pri);transition:width .5s cubic-bezier(.2,.7,.3,1)}
+.vstat .vs .c{text-align:right;font-variant-numeric:tabular-nums;color:var(--tx)}
+.st1{background:var(--green-l);color:var(--green);border-color:#b9e3cb}
+.st2{background:var(--amber-l);color:var(--amber);border-color:#efdca6}
+.st3{background:#f2f4f7;color:var(--tx2);border-color:#e0e5ed}
+.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.formgrid .full{grid-column:1/-1}
+@media(max-width:720px){.formgrid{grid-template-columns:1fr}}
+.pick-row{display:flex;gap:8px;align-items:flex-end}
+.pick-row>div:first-child{flex:1}
+
+/* ---------- 账号输入框的「上次登录」下拉 ---------- */
+.ac-wrap{position:relative}
+.ac-list{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:40;max-height:238px;overflow-y:auto;
+  background:linear-gradient(180deg,#fdfaf3,#f6f0e1);border:1px solid rgba(201,162,39,.55);border-radius:5px;
+  box-shadow:0 18px 34px -12px rgba(50,38,10,.5)}
+.ac-list .ai{display:flex;align-items:center;gap:8px;padding:8px 10px;cursor:pointer;
+  border-bottom:1px solid rgba(140,120,70,.16);transition:.12s}
+.ac-list .ai:hover,.ac-list .ai.on{background:rgba(201,162,39,.20)}
+.ac-list .ai .p{font-family:ui-monospace,Consolas,monospace;font-size:13px;color:#2a3140;flex:none}
+.ac-list .ai .n{flex:1;min-width:0;font-size:11.5px;color:#8b8265;text-align:right;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ac-list .ai .lv{font-size:10.5px;padding:0 5px;border-radius:2px;line-height:15px;border:1px solid;flex:none}
+.ac-list .ai .lv.town{color:#8a6a12;border-color:rgba(176,138,30,.6);background:rgba(201,162,39,.16)}
+.ac-list .ai .lv.vil{color:#3f5f42;border-color:rgba(90,130,95,.5);background:rgba(120,160,120,.16)}
+.ac-list .ai .rm{width:16px;height:16px;line-height:16px;border-radius:3px;flex:none;padding:0;
+  color:#c2b593;font-size:11px;text-align:center;background:transparent}
+.ac-list .ai .rm:hover{background:rgba(176,58,46,.16);color:#b03a2e}
+.ac-list .ac-empty{padding:10px 11px;font-size:11.5px;color:#a89a76;line-height:1.7}
+.ac-list .ac-foot{display:flex;align-items:center;gap:8px;padding:6px 10px;
+  border-top:1px solid rgba(140,120,70,.20);background:rgba(201,162,39,.08)}
+.ac-list .ac-tip{flex:1;font-size:10.5px;color:#a89a76}
+.lnk{font-size:11.5px;color:#8b8265;background:none;border:none;padding:0;
+  text-decoration:underline;text-underline-offset:2px}
+.lnk:hover{color:#b03a2e}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="toasts"></div>
+<div id="modal-root"></div>
+
+<script>
+/* ============================================================
+   向阳堡乡退役军人服务站信息管理系统  —— 纯前端单文件 H5
+   数据：不预置任何示例档案，全部由经办人录入，持久化于浏览器 localStorage
+   ============================================================ */
+
+/* ---------------- 常量 ---------------- */
+var VILLAGES = ['向阳堡村','中钟牌村','西钟牌村','大庄村','铺上村','东平太村','马家洼村','张小峰村',
+  '南汉井村','下梨园村','刘小峰村','北汉井村','小庄村','郝小峰村','左小峰村','杨树坡村','店梁村',
+  '缑村','赵庄村','代井沟村','西平太村'];
+
+var TOWN_NAME = '向阳堡乡';
+
+/* ---------------- 地图几何：取自《平鲁区向阳堡乡地图》 ---------------- */
+var MAP_VB=[940,700];
+/* 乡域边界（由参考地图轮廓矢量化，示意性，非精确测绘） */
+var TOWN_BORDER='M564.5 46 L559.3 50.2 L554 75.4 L497.3 87 L441.6 122.7 L436.4 132.1 L438.5 144.7 L402.8 152.1 L395.4 168.9 L341.9 171 L299.9 186.7 L258.9 266.5 L240 282.3 L236.9 308.5 L211.7 312.7 L205.4 319 L203.3 331.6 L189.6 346.3 L189.6 362.1 L205.4 394.6 L214.8 433.5 L211.7 453.4 L190.7 455.5 L177 476.5 L185.4 496.5 L181.2 501.7 L185.4 519.6 L182.3 539.5 L199.1 563.7 L199.1 599.4 L213.8 610.9 L236.9 614.1 L265.2 654 L269.4 654 L296.7 637.2 L431.1 636.1 L486.8 612 L500.5 601.5 L500.5 581.5 L524.6 575.2 L536.2 558.4 L565.6 549 L572.9 523.8 L581.3 515.4 L578.2 497.5 L587.6 490.2 L592.9 473.4 L641.2 456.6 L669.5 430.3 L725.2 406.2 L757.7 377.8 L752.5 342.1 L747.2 335.8 L711.5 324.3 L686.3 323.2 L670.6 314.8 L729.4 290.7 L747.2 269.7 L761.9 240.3 L763 201.4 L757.7 187.8 L730.4 167.8 L719.9 120.6 L700 95.4 L586.6 87 L580.3 67 L564.5 46';
+/* 21 个行政村：名称, x, y, 村名标注方位(u上/d下/l左/r右) */
+var MAP_VILLAGES=[
+  ['向阳堡村',494.8,446.5,'r'],
+  ['中钟牌村',333.1,561.8,'u'],
+  ['西钟牌村',283.9,591.1,'u'],
+  ['大庄村',520.2,393.7,'u'],
+  ['铺上村',222.9,572.2,'d'],
+  ['东平太村',677.3,265.6,'l'],
+  ['马家洼村',384.8,516.2,'r'],
+  ['张小峰村',440.5,288.9,'l'],
+  ['南汉井村',727.0,219.2,'l'],
+  ['下梨园村',560.4,493.5,'l'],
+  ['刘小峰村',371.0,240.4,'r'],
+  ['北汉井村',661.1,191.2,'u'],
+  ['小庄村',561.1,388.1,'d'],
+  ['郝小峰村',341.7,270.1,'r'],
+  ['左小峰村',466.4,214.2,'r'],
+  ['杨树坡村',597.2,388.9,'u'],
+  ['店梁村',234.6,497.1,'l'],
+  ['缑村',566.4,179.7,'l'],
+  ['赵庄村',678.2,383.6,'d'],
+  ['代井沟村',471.6,348.8,'r'],
+  ['西平太村',572.4,275.7,'u']
+];
+/* 自然村（仅作底图标注） */
+var MAP_NATURE=[
+  ['小川',564.6,108.8,'r'],
+  ['程村',597.2,176.5,'u'],
+  ['乔小峰',286.1,306.5,'u'],
+  ['新村',489.1,299.9,'u'],
+  ['柳树咀',277.5,372.5,'u'],
+  ['大坡',371.3,326.7,'d'],
+  ['泉儿沟',362.1,385.3,'d'],
+  ['宋井沟',463.1,317.0,'l'],
+  ['前梁',268.1,438.8,'r'],
+  ['石门',361.5,431.3,'r'],
+  ['平番城',461.5,560.8,'l'],
+  ['东坡',491.9,524.1,'u']
+];
+/* 主干道（示意走向） */
+var MAP_ROADS=[
+  'M511 101.7 L490 122.7 L460.5 151 L437.4 168.9 L416.4 183.6 L394.4 198.3 L373.4 219.3 L351.3 240.3 L330.3 261.3 L328.2 288.6 L319.8 314.8 L309.3 345.3 L298.8 367.3 L288.3 388.3 L277.8 409.3 L275.7 434.5 L267.3 452.4 L256.8 473.4 L256.8 494.4 L246.3 515.4 L219 539.5 L185.4 553.2',
+  'M597.1 116.4 L574 137.4 L547.7 158.4 L515.2 175.2 L492.1 187.8 L460.5 204.6 L434.3 221.4 L410.1 242.4 L389.1 263.4 L370.2 284.4 L353.4 305.4 L338.7 326.4 L326.1 347.4 L313.5 368.4 L303 389.4 L294.6 410.4 L288.3 431.4 L284.1 452.4 L282 473.4 L279.9 490.2',
+  'M279.9 490.2 L324 481.8 L371.3 473.4 L420.6 458.7 L465.8 446.1 L502.6 414.6 L519.4 397.8 L557.2 385.2 L597.1 378.9 L639.1 376.8 L675.8 381 L706 386.4'
+];
+var MAP_GOV=[437.7,503.7];
+
+/* 人员类别：veteran=退役军人，key=重点优抚对象，lc=两参人员 */
+var CATEGORIES = [
+  {n:'退役士兵',        veteran:true,  key:false, lc:false, w:44},
+  {n:'转业士官',        veteran:true,  key:false, lc:false, w:8},
+  {n:'复员军人',        veteran:true,  key:true,  lc:false, w:6},
+  {n:'军队离退休干部',  veteran:true,  key:true,  lc:false, w:2},
+  {n:'残疾军人',        veteran:true,  key:true,  lc:false, w:6},
+  {n:'参战参试人员',    veteran:true,  key:true,  lc:true,  w:9},
+  {n:'烈士遗属',        veteran:false, key:true,  lc:false, w:3},
+  {n:'因公牺牲军人遗属',veteran:false, key:true,  lc:false, w:2},
+  {n:'病故军人遗属',    veteran:false, key:true,  lc:false, w:4},
+  {n:'现役军人家属',    veteran:false, key:false, lc:false, w:16}
+];
+var CAT_NAMES = CATEGORIES.map(function(c){return c.n});
+var POLITICAL = ['中共党员','中共预备党员','共青团员','群众','民主党派'];
+var METHODS = ['电话','实地走访','网络平台','其它'];
+var RELATIONS = ['配偶','子','女','父','母','兄弟','姐妹','其他'];
+
+/* 来访诉求：办理情况（下拉框，依据需求文档「来访诉求」模块） */
+var VISIT_STATUS = ['已办结','处理中','未进行'];
+/* 七包一：责任分工角色（依据《涉军信访人员“七包一”台账》表头） */
+var BAOYI_ROLES = ['区级包案领导','乡级负责人','村级负责人','派出所负责人','法律工作者'];
+
+/* 五角星路径（64×64 视图框），登录页徽记与系统标识共用 */
+var STAR_PATH='M32 12 L36.94 25.2 L51.02 25.82 L39.99 34.6 L43.76 48.18 L32 40.4 L20.24 48.18 L24.01 34.6 L12.98 25.82 L27.06 25.2 Z';
+
+/* 图表配色 */
+var CHART_COLORS=['#1652a8','#2a7de1','#5aa0e8','#0f9d58','#c9a227','#d92d20','#7f77dd','#0f6e56','#d4537e','#888780'];
+
+/* 数据权限表（账号即手机号，初始密码 Aa123456）
+   排序：乡级账号在前，李文强（乡镇书记）列首条；一键预警默认发送至首个乡级账号 */
+var ACCOUNTS = [
+  {v:TOWN_NAME, n:'李文强', p:'15303496464', lv:'town'},
+  {v:TOWN_NAME, n:'程晓青', p:'13834431228', lv:'town'},
+  {v:TOWN_NAME, n:'赵荣鑫', p:'15735104496', lv:'town'},
+  {v:'中钟牌村', n:'宋德儒', p:'13834431104', lv:'vil'},
+  {v:'小庄村',   n:'陈飞',   p:'18534941599', lv:'vil'},
+  {v:'北汉井村', n:'靳维壮', p:'13934951621', lv:'vil'},
+  {v:'左小峰村', n:'吴海林', p:'15934499798', lv:'vil'},
+  {v:'西平太村', n:'刘小平', p:'18734997618', lv:'vil'},
+  {v:'缑村',   n:'范增',   p:'18403482345', lv:'vil'},
+  {v:'杨树坡村', n:'孟铭',   p:'13994949141', lv:'vil'},
+  {v:'西钟牌村', n:'韩建平', p:'13593455939', lv:'vil'},
+  {v:'马家洼村', n:'刘国成', p:'18406401666', lv:'vil'},
+  {v:'张小峰村', n:'刘满',   p:'13546791169', lv:'vil'},
+  {v:'向阳堡村', n:'南志强', p:'15110844109', lv:'vil'},
+  {v:'铺上村',   n:'孔义',   p:'13080391981', lv:'vil'},
+  {v:'下梨园村', n:'王永刚', p:'13834401801', lv:'vil'},
+  {v:'店梁村',   n:'杨俊青', p:'15364635913', lv:'vil'},
+  {v:'大庄村',   n:'宋万军', p:'13753095988', lv:'vil'},
+  {v:'东平太村', n:'赵亚文', p:'17835756565', lv:'vil'},
+  {v:'郝小峰村', n:'郝永红', p:'13834198442', lv:'vil'},
+  {v:'南汉井村', n:'王宝',   p:'13994928087', lv:'vil'},
+  {v:'代井沟村', n:'陈忠',   p:'13096607892', lv:'vil'},
+  {v:'刘小峰村', n:'张建',   p:'18536555111', lv:'vil'},
+  {v:'赵庄村',   n:'于清',   p:'17636265745', lv:'vil'}
+];
+
+var IMPORT_HEADERS = ['行政村名','姓名','性别','身份证号','家庭住址','联系方式','人员类别','政治面貌',
+  '入伍时间','退伍时间','是否兵支书','立功信息','风险防控等级','家庭成员信息','常态化联系信息','备注'];
+
+/* 存储键。v4：修复「新增档案 village 丢失」缺陷（v3 及更早录入的记录 village 为空，
+   在任何村的列表里都查不到），故升级键名并清理历史键，让这些不可用的脏数据作废。 */
+var STORE_KEY = 'xyb_veterans_v4';
+var LEGACY_KEYS = ['xyb_veterans_v1','xyb_veterans_v2','xyb_veterans_v3'];
+
+/* 本机登录记录：只记「登录过的账号」，绝不保存密码。
+   用独立存储键，不进入 JSON 备份文件，也不受「清空全部数据」影响
+   （换机迁移业务数据时不会把上一个人的登录记录带过去）。 */
+var LOGIN_KEY = 'xyb_login_history_v1';
+var LOGIN_MAX = 8;
+
+/* ---------------- 工具 ---------------- */
+function pad2(n){return n<10?'0'+n:''+n}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(m){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]})}
+function $(id){return document.getElementById(id)}
+function clone(o){return JSON.parse(JSON.stringify(o))}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,8)}
+function today(){var d=new Date();return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate())}
+function nowStr(){var d=new Date();return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate())+' '+pad2(d.getHours())+':'+pad2(d.getMinutes())+':'+pad2(d.getSeconds())}
+
+function toast(msg,type){
+  var el=document.createElement('div');
+  el.className='toast'+(type?' '+type:'');
+  el.textContent=msg;
+  $('toasts').appendChild(el);
+  setTimeout(function(){el.style.transition='opacity .3s';el.style.opacity='0';setTimeout(function(){el.remove()},320)},2200);
+}
+function closeModal(){$('modal-root').innerHTML=''}
+function openModal(html,wide){
+  $('modal-root').innerHTML='<div class="mask" data-mask="1"><div class="modal'+(wide?' wide':'')+'">'+html+'</div></div>';
+}
+function catOf(name){for(var i=0;i<CATEGORIES.length;i++){if(CATEGORIES[i].n===name)return CATEGORIES[i]}return {n:name,veteran:false,key:false,lc:false}}
+function idCardCheck(body17){
+  var w=[7,9,10,5,8,4,2,1,6,3,7,9,10,5,8,4,2],c='10X98765432',s=0;
+  for(var i=0;i<17;i++)s+=(+body17[i])*w[i];
+  return c[s%11];
+}
+function maskPhone(p){return p?p.replace(/^(\d{3})\d{4}(\d{4})$/,'$1****$2'):''}
+
+/* ---------------- 初始数据：空 ----------------
+   系统不预置任何示例档案，21 个行政村首次进入均为空数据，
+   由各权限范围的经办人通过「新增人员」自行录入。 */
+function genPersons(){
+  return [];
+}
+
+/* 人员档案默认结构 —— 唯一来源。
+   新增表单、Excel 导入、示例数据都从这里派生，避免某一处漏字段
+   （曾因新增表单自建对象漏了 village，导致保存后记录在任何村都查不到）。 */
+function newPerson(village){
+  return {
+    village:village||'', name:'', gender:'男', idCard:'', address:'', phone:'',
+    category:CAT_NAMES[0], political:'群众', enlistDate:'', dischargeDate:'',
+    isSecretary:'否', merit:'', riskLevel:0,        /* 0 = 未评定（需求 8：风险等级非必填） */
+    photo:'',                                       /* 需求 4：人员照片（dataURL） */
+    family:[], contacts:[], aids:[],                /* 需求 5：aids = 动态帮扶记录 */
+    remark:''
+  };
+}
+/* 来访诉求默认结构。
+   注意：handle = 办理情况（已办结 / 处理中 / 未进行）；status = 软删除标记（1 正常 / 0 已删除）。 */
+function newVisit(village){
+  return {
+    id:'V'+uid(), village:village||'', date:today(), name:'', gender:'男', nation:'汉族',
+    address:'', phone:'', dischargeDate:'', receiver:'', appeal:'',
+    handle:VISIT_STATUS[1], remark:'',
+    status:1, delReason:'', delAt:'',
+    createdAt:nowStr(), updatedAt:''
+  };
+}
+/* 七包一默认结构（字段取自《涉军信访人员“七包一”台账》表头） */
+function newBaoyi(village){
+  return {
+    id:'B'+uid(), village:village||'', unit:TOWN_NAME, name:'', personId:'',
+    hukou:'', residence:'', category:'', district:'', town:'', villageLd:'',
+    police:'', legal:'', remark:'',
+    createdAt:nowStr(), updatedAt:'',
+    status:1, delReason:'', delAt:''
+  };
+}
+
+/* ---------------- 数据存取 ---------------- */
+var DB=null;
+function defaultDB(){
+  return {
+    persons:genPersons(),
+    warnings:[],
+    visits:[],              /* 来访诉求 */
+    baoyi:[],               /* 七包一 */
+    passwords:{},           /* 手机号 -> 密码（改密后写入） */
+    pageNotes:{},           /* 页面备注 */
+    seeded:true
+  };
+}
+/* 结构就地升级：为早期版本写入的记录补齐新增字段。
+   本次新增字段均为「可缺省」的增量字段，不需要换存储键、不会丢数据。 */
+function normalizeDB(){
+  if(!DB.warnings)DB.warnings=[];
+  if(!DB.passwords)DB.passwords={};
+  if(!DB.pageNotes)DB.pageNotes={};
+  if(!DB.visits)DB.visits=[];
+  if(!DB.baoyi)DB.baoyi=[];
+  (DB.persons||[]).forEach(function(p){
+    if(typeof p.photo!=='string')p.photo='';
+    if(!p.aids)p.aids=[];
+    if(!p.family)p.family=[];
+    if(!p.contacts)p.contacts=[];
+    p.family.forEach(function(f){if(typeof f.address!=='string')f.address=''});
+    p.contacts.forEach(function(c){if(!c.photos)c.photos=[]});
+    p.aids.forEach(function(a){if(!a.photos)a.photos=[]});
+  });
+  (DB.visits||[]).forEach(function(v){
+    if(!v.id)v.id='V'+uid();
+    if(!v.handle||VISIT_STATUS.indexOf(v.handle)<0)v.handle=VISIT_STATUS[1];
+    if(v.status!==0)v.status=1;
+    if(typeof v.delReason!=='string')v.delReason='';
+    if(typeof v.delAt!=='string')v.delAt='';
+  });
+  (DB.baoyi||[]).forEach(function(b){
+    if(!b.id)b.id='B'+uid();
+    if(b.status!==0)b.status=1;
+    if(typeof b.delReason!=='string')b.delReason='';
+    if(typeof b.delAt!=='string')b.delAt='';
+  });
+}
+function loadDB(){
+  try{
+    for(var li=0;li<LEGACY_KEYS.length;li++){ try{ localStorage.removeItem(LEGACY_KEYS[li]) }catch(e2){} }
+    var raw=localStorage.getItem(STORE_KEY);
+    if(raw){
+      DB=JSON.parse(raw);
+      /* 仅当结构本身不可用（不是对象 / 没有 persons 数组）才重建，
+         空库（0 条档案）是合法状态，不能被当成损坏数据清掉。 */
+      if(!DB||typeof DB!=='object'||!DB.persons)DB=defaultDB();
+    }else DB=defaultDB();
+  }catch(e){ DB=defaultDB(); }
+  normalizeDB();
+}
+
+function saveDB(){
+  try{ localStorage.setItem(STORE_KEY,JSON.stringify(DB)); return true }
+  catch(e){ toast('本地存储空间不足，本次修改未持久化（照片过多时容易出现）','err'); return false }
+}
+function resetDB(){
+  DB=defaultDB(); saveDB();
+}
+
+/* ---------------- 会话 ---------------- */
+var S={user:null,view:'login',village:null,editId:null,detailId:null,filters:null,filtersAll:null,
+  formFrom:'village',page:1,showDeleted:false};
+
+/* ---------------- 统计 ---------------- */
+function personsOf(v){
+  return DB.persons.filter(function(p){return p.village===v&&p.status===1});
+}
+function statOf(v){
+  var ps=personsOf(v),o={total:ps.length,veteran:0,key:0,lc:0,party:0,secretary:0,r0:0,r1:0,r2:0,r3:0};
+  ps.forEach(function(p){
+    var c=catOf(p.category);
+    if(c.veteran)o.veteran++;
+    if(c.key)o.key++;
+    if(c.lc)o.lc++;
+    if(p.political==='中共党员'||p.political==='中共预备党员')o.party++;
+    if(p.isSecretary==='是')o.secretary++;
+    if(p.riskLevel===1)o.r1++;else if(p.riskLevel===2)o.r2++;else if(p.riskLevel===3)o.r3++;else o.r0++;
+  });
+  return o;
+}
+/* 风险等级：0 / 空 = 未评定（需求 8 允许不填） */
+function riskBadge(lv){
+  if(lv===1)return '<span class="badge b1">1级 高</span>';
+  if(lv===2)return '<span class="badge b2">2级 中</span>';
+  if(lv===3)return '<span class="badge b3">3级 低</span>';
+  return '<span class="badge b0">未评定</span>';
+}
+function riskName(lv){
+  if(lv===1)return '1 级 · 高风险';
+  if(lv===2)return '2 级 · 中风险';
+  if(lv===3)return '3 级 · 低风险';
+  return '未评定';
+}
+/* 排序权重：1 级最前，未评定最后 */
+function riskRank(lv){return (lv===1||lv===2||lv===3)?lv:9}
+/* 按风险等级排序（需求 3）：同级按建档时间先后，保证顺序稳定 */
+function sortByRisk(list){
+  return list.slice().sort(function(a,b){
+    var d=riskRank(a.riskLevel)-riskRank(b.riskLevel);
+    if(d)return d;
+    var ca=a.createdAt||'',cb=b.createdAt||'';
+    if(ca!==cb)return ca<cb?-1:1;
+    return 0;
+  });
+}
+/* 来访诉求：办理情况的标签样式 */
+function visitCls(s){return s==='已办结'?'st1':(s==='处理中'?'st2':'st3')}
+function townStat(){
+  var o={total:0,veteran:0,key:0,lc:0,r1:0,covered:0};
+  VILLAGES.forEach(function(v){
+    var s=statOf(v);
+    o.total+=s.total;o.veteran+=s.veteran;o.key+=s.key;o.lc+=s.lc;o.r1+=s.r1;
+    if(s.total>0)o.covered++;
+  });
+  return o;
+}
+function visibleVillages(){
+  if(!S.user)return [];
+  if(S.user.lv==='town')return VILLAGES.slice();
+  return [S.user.v];
+}
+function canAccess(v){
+  if(!S.user)return false;
+  return S.user.lv==='town'||S.user.v===v;
+}
+/* 全部乡级账号（按 ACCOUNTS 顺序，首位为一键预警默认接收人） */
+function townAccounts(){
+  return ACCOUNTS.filter(function(a){return a.lv==='town'});
+}
+
+/* ---------------- 地图 ---------------- */
+/* 色阶：由浅到深，表示退役军人数量多少 */
+function mixColor(t){
+  var a=[223,235,250], b=[26,86,168];
+  var r=Math.round(a[0]+(b[0]-a[0])*t), g=Math.round(a[1]+(b[1]-a[1])*t), bl=Math.round(a[2]+(b[2]-a[2])*t);
+  return 'rgb('+r+','+g+','+bl+')';
+}
+/* 村名标注方位：u上 d下 l左 r右（取自参考地图上村名相对标记点的位置） */
+function mapLabel(x,y,dir){
+  if(dir==='u')return [x,y-23,'middle'];
+  if(dir==='d')return [x,y+31,'middle'];
+  if(dir==='l')return [x-19,y+4.4,'end'];
+  return [x+19,y+4.4,'start'];
+}
+
+function renderMap(){
+  var maxC=1;
+  VILLAGES.forEach(function(v){var s=statOf(v);if(s.total>maxC)maxC=s.total});
+  var allowed=visibleVillages();
+  var W=MAP_VB[0],H=MAP_VB[1];
+
+  /* 底图：主干道（白色描边 + 金色路面） */
+  var roads=MAP_ROADS.map(function(d){
+    return '<path d="'+d+'" fill="none" stroke="#ffffff" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" opacity=".9"/>'
+      +'<path d="'+d+'" fill="none" stroke="#e3ab2f" stroke-width="4.6" stroke-linecap="round" stroke-linejoin="round"/>';
+  }).join('');
+
+  /* 底图地名：自然村（仅作地理参照，无数据、不可点击）
+     按制图惯例降为底图要素——不画标记点，只留浅灰斜体小字，
+     与「行政村」的主题要素（深色加粗村名 + 数据气泡）拉开层级 */
+  var nature=MAP_NATURE.map(function(n){
+    var left=(n[3]==='l');
+    return '<text class="nlabel" x="'+(left?n[1]-2:n[1]+2)+'" y="'+(n[2]+3.6)+'" text-anchor="'+(left?'end':'start')+'">'+esc(n[0])+'</text>';
+  }).join('');
+
+  /* 21 个行政村 */
+  var blobs='',labels='';
+  MAP_VILLAGES.forEach(function(v){
+    var name=v[0],x=v[1],y=v[2],dir=v[3];
+    var s=statOf(name);
+    var on=allowed.indexOf(name)>=0;
+    var t=maxC>0?Math.min(1,s.total/maxC):0;
+    var rad=on?Math.round(10+t*9):10;
+    var fill=on?mixColor(0.16+t*0.7):'#e9edf3';
+    var txt=on?(t>0.52?'#ffffff':'#123a6b'):'#aab3bf';
+    var lp=mapLabel(x,y,dir);
+    blobs+='<g class="vcell'+(on?'':' dis')+'" data-v="'+esc(name)+'">'
+      +'<circle cx="'+x+'" cy="'+y+'" r="'+(rad+14)+'" fill="transparent"/>'
+      +'<circle class="vdot" cx="'+x+'" cy="'+y+'" r="'+rad+'" fill="'+fill+'" stroke="#ffffff" stroke-width="2.2"/>'
+      +(on?'<text class="vnum" x="'+x+'" y="'+(y+4.6)+'" text-anchor="middle" fill="'+txt+'">'+s.total+'</text>':'')
+      +(on&&s.r1>0?'<circle cx="'+(x+rad*0.74).toFixed(1)+'" cy="'+(y-rad*0.74).toFixed(1)+'" r="7.6"'
+        +' fill="#d92d20" stroke="#ffffff" stroke-width="1.8"/>'
+        +'<text class="vbadge" x="'+(x+rad*0.74).toFixed(1)+'" y="'+(y-rad*0.74+3.5).toFixed(1)+'"'
+        +' text-anchor="middle" fill="#ffffff">'+s.r1+'</text>':'')
+      +'</g>';
+    labels+='<text class="vlabel" x="'+lp[0]+'" y="'+lp[1]+'" text-anchor="'+lp[2]+'"'
+      +' fill="'+(on?'#1e2430':'#9aa3b0')+'">'+esc(name)+'</text>';
+  });
+
+  /* 乡政府驻地 */
+  var gov='<g class="govmark">'
+    +'<rect x="'+(MAP_GOV[0]-5.5)+'" y="'+(MAP_GOV[1]-5.5)+'" width="11" height="11" rx="2.5"'
+    +' fill="#b03a2e" stroke="#ffffff" stroke-width="2"/>'
+    +'<text class="govlabel" x="'+MAP_GOV[0]+'" y="'+(MAP_GOV[1]-13)+'" text-anchor="middle">向阳堡乡人民政府</text>'
+    +'</g>';
+
+  var legend='';
+  for(var i=0;i<=4;i++)legend+='<i style="background:'+mixColor(0.16+(i/4)*0.7)+'"></i>';
+
+  return '<div class="map-wrap">'
+    +'<div class="map-legend">'
+    +'<span>退役军人数量：</span><span style="display:flex;align-items:center">少 '+legend+' 多</span>'
+    +'<span><span class="dot d-red" style="display:inline-block;vertical-align:middle;margin-right:4px"></span>角标为 1 级风险人数</span>'
+    +'<span class="muted3">斜体小字为自然村（仅地理参照，无数据）</span>'
+    +'<span class="muted3">轮廓依据《平鲁区向阳堡乡地图》绘制，为示意性分布，非精确测绘边界</span>'
+    +'</div>'
+    +'<svg class="map-svg" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="向阳堡乡21个行政村分布示意图">'
+    /* 画布压暗（需求 2）：乡域之外压成深色底，乡域本身留浅色，形成"图"与"底"的明暗对比 */
+    +'<defs>'
+      +'<linearGradient id="mapbg" x1="0" y1="0" x2="1" y2="1">'
+        +'<stop offset="0" stop-color="#1e2c42"/><stop offset=".55" stop-color="#16202f"/><stop offset="1" stop-color="#0f1826"/>'
+      +'</linearGradient>'
+      +'<filter id="townsh" x="-8%" y="-8%" width="116%" height="116%">'
+        +'<feDropShadow dx="0" dy="2.5" stdDeviation="6" flood-color="#000000" flood-opacity=".5"/>'
+      +'</filter>'
+    +'</defs>'
+    +'<rect x="0" y="0" width="'+W+'" height="'+H+'" fill="url(#mapbg)" rx="10"/>'
+    +'<path d="'+TOWN_BORDER+'" fill="#fbf4e4" stroke="#c9a227" stroke-width="6.6" stroke-linejoin="round"'
+      +' stroke-opacity=".55" filter="url(#townsh)"/>'
+    +'<path d="'+TOWN_BORDER+'" fill="none" stroke="#1652a8" stroke-width="3.2" stroke-linejoin="round"/>'
+    +roads+nature+gov+blobs+labels
+    +'</svg>'
+    +'<div class="hover-tip" id="mtip"></div>'
+    +'</div>';
+}
+
+/* ---------------- 本机登录记录（只存账号，不存密码） ---------------- */
+function accountOf(phone){
+  for(var i=0;i<ACCOUNTS.length;i++)if(ACCOUNTS[i].p===phone)return ACCOUNTS[i];
+  return null;
+}
+function loadLoginHistory(){
+  try{
+    var raw=localStorage.getItem(LOGIN_KEY);
+    var a=raw?JSON.parse(raw):[];
+    if(!(a instanceof Array))return [];
+    var out=[];
+    for(var i=0;i<a.length;i++){
+      var p=String(a[i]);
+      /* 账号已不在数据权限表里的，自动剔除 */
+      if(accountOf(p)&&out.indexOf(p)<0)out.push(p);
+    }
+    return out.slice(0,LOGIN_MAX);
+  }catch(e){return []}
+}
+function saveLoginHistory(a){
+  try{ localStorage.setItem(LOGIN_KEY,JSON.stringify(a.slice(0,LOGIN_MAX))) }catch(e){}
+}
+/* 登录成功后调用：把账号挪到最前（只记账号，不含密码） */
+function rememberLogin(phone){
+  var a=loadLoginHistory().filter(function(p){return p!==phone});
+  a.unshift(phone);
+  saveLoginHistory(a);
+}
+function forgetLogin(phone){
+  saveLoginHistory(loadLoginHistory().filter(function(p){return p!==phone}));
+}
+
+/* ---- 账号输入框的下拉：点一下输入框就弹出登录过的账号，选一个直接填 ---- */
+var AC_IDX=-1;
+function acList(filter){
+  var hist=loadLoginHistory(),out=[];
+  for(var i=0;i<hist.length;i++){
+    var a=accountOf(hist[i]);
+    if(!a)continue;
+    /* 已经敲了几位数字就按手机号前缀筛，敲的是名字就按姓名筛 */
+    if(filter&&a.p.indexOf(filter)!==0&&a.n.indexOf(filter)<0)continue;
+    out.push(a);
+  }
+  return out;
+}
+function renderAc(){
+  var box=$('lg-ac');
+  if(!box)return;
+  var items=acList($('lg-phone').value.trim());
+  var body;
+  if(items.length){
+    body=items.map(function(a){
+      return '<div class="ai" data-pick="'+esc(a.p)+'">'
+        +'<span class="p">'+esc(a.p)+'</span>'
+        +'<span class="n">'+esc(a.n)+' · '+esc(a.v===TOWN_NAME?'向阳堡乡（全乡）':a.v)+'</span>'
+        +'<span class="lv '+(a.lv==='town'?'town':'vil')+'">'+(a.lv==='town'?'乡级':'村级')+'</span>'
+        +'<button class="rm" data-forget="'+esc(a.p)+'" title="从本机记录中移除">✕</button>'
+        +'</div>';
+    }).join('');
+  }else{
+    body='<div class="ac-empty">'+(loadLoginHistory().length
+      ?'没有匹配的账号，可直接输入手机号'
+      :'本机暂无登录记录 —— 登录一次后会自动记住账号')+'</div>';
+  }
+  box.innerHTML=body
+    +'<div class="ac-foot"><span class="ac-tip">只记账号，不存密码</span>'
+    +'<button class="lnk" id="lg-clear">清除记录</button></div>';
+  AC_IDX=-1;
+  bindAcItems();
+}
+function showAc(){var b=$('lg-ac');if(!b)return;renderAc();b.classList.remove('hide')}
+function hideAc(){var b=$('lg-ac');if(b)b.classList.add('hide');AC_IDX=-1}
+function paintAc(){
+  var rows=document.querySelectorAll('#lg-ac .ai');
+  for(var i=0;i<rows.length;i++){
+    if(i===AC_IDX)rows[i].classList.add('on');else rows[i].classList.remove('on');
+  }
+}
+function bindAcItems(){
+  Array.prototype.forEach.call(document.querySelectorAll('#lg-ac .ai'),function(el){
+    el.onmousedown=function(ev){if(ev&&ev.preventDefault)ev.preventDefault()};
+    el.onclick=function(ev){
+      var t=ev&&ev.target;
+      if(t&&t.closest&&t.closest('[data-forget]'))return;   /* 点 ✕ 时不带出 */
+      pickAccount(el.getAttribute('data-pick'));
+    };
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('#lg-ac [data-forget]'),function(b){
+    b.onmousedown=function(ev){if(ev&&ev.preventDefault)ev.preventDefault()};
+    b.onclick=function(ev){
+      if(ev&&ev.stopPropagation)ev.stopPropagation();
+      forgetLogin(b.getAttribute('data-forget'));
+      renderAc();
+    };
+  });
+  var clr=$('lg-clear');
+  if(clr){
+    clr.onmousedown=function(ev){if(ev&&ev.preventDefault)ev.preventDefault()};
+    clr.onclick=function(ev){
+      if(ev&&ev.stopPropagation)ev.stopPropagation();
+      saveLoginHistory([]);hideAc();
+      toast('已清除本机登录记录');
+    };
+  }
+}
+/* 选中账号：只填账号，密码一律留空，光标直接跳到密码框 */
+function pickAccount(p){
+  $('lg-phone').value=p;
+  $('lg-pwd').value='';
+  hideAc();
+  $('lg-pwd').focus();
+}
+
+/* ---------------- 视图：登录 ---------------- */
+function viewLogin(){
+  var STAR=STAR_PATH;
+  var accRows=ACCOUNTS.map(function(a){
+    return '<div class="rw" data-fill="'+a.p+'">'
+      +'<span class="nm">'+esc(a.n)+'</span>'
+      +'<span class="ph">'+esc(a.p)+'</span>'
+      +'<span class="vg">'+esc(a.v==='向阳堡乡'?'向阳堡乡（全乡）':a.v)+'</span>'
+      +'<span class="lv '+(a.lv==='town'?'town':'vil')+'">'+(a.lv==='town'?'乡级':'村级')+'</span>'
+      +'</div>';
+  }).join('');
+  return '<div class="lg2">'
+    +'<section class="honor">'
+      +'<svg class="starwm" viewBox="0 0 100 100" aria-hidden="true">'
+        +'<circle cx="50" cy="50" r="48"/><circle cx="50" cy="50" r="34"/>'
+        +'<path d="M50 4 L61.4 34.3 L93.75 35.79 L68.45 56 L77.04 87.21 L50 69.4 L22.96 87.21 L31.55 56 L6.25 35.79 L38.6 34.3 Z"/>'
+      +'</svg>'
+      +'<div class="honor-inner">'
+        +'<div class="honor-emblem"><svg viewBox="0 0 64 64" aria-hidden="true">'
+          +'<circle cx="32" cy="32" r="30" fill="none" stroke="#c9a227" stroke-width="1.2" opacity=".9"/>'
+          +'<circle cx="32" cy="32" r="25" fill="none" stroke="#c9a227" stroke-width=".6" opacity=".5"/>'
+          +'<path d="'+STAR+'" fill="#c0392b"/>'
+        +'</svg></div>'
+        +'<h1 class="honor-title">向阳堡乡退役军人<br>服务站信息管理系统</h1>'
+        +'<div class="honor-rule"><span></span><i>◆</i><span></span></div>'
+        +'<p class="honor-sub">山西省朔州市平鲁区 · 向阳堡乡</p>'
+        +'<ul class="honor-list">'
+          +'<li>覆盖全乡 <b>21</b> 个行政村，村级台账一村一册</li>'
+          +'<li>乡级账号可查看全乡数据，村级账号仅限本村</li>'
+          +'<li>人员信息新增 / 编辑 / 删除 / 查询 / 导出 / 导入</li>'
+          +'<li>风险防控分级（1 级红 · 2 级黄 · 3 级蓝）与一键预警</li>'
+        +'</ul>'
+        +'<div class="honor-foot"><span class="rb"></span><p>退役不褪色　建功新时代</p></div>'
+      +'</div>'
+    +'</section>'
+    +'<section class="lg2-form">'
+      +'<div class="card-in">'
+        +'<div class="card-head">'
+          +'<span class="seal"><svg viewBox="0 0 64 64" aria-hidden="true">'
+            +'<circle cx="32" cy="32" r="29" fill="none" stroke="#b03a2e" stroke-width="2.6"/>'
+            +'<path d="'+STAR+'" fill="#b03a2e"/>'
+          +'</svg></span>'
+          +'<div><h2>账号登录</h2><p>经办人账号 · 非退役军人本人账号</p></div>'
+        +'</div>'
+        +'<div class="lgf"><label>账号（手机号）<span class="req">*</span></label>'
+          +'<div class="ac-wrap">'
+            +'<input class="lg-inp" id="lg-phone" placeholder="请输入 11 位手机号" maxlength="11" autocomplete="off">'
+            +'<div class="ac-list hide" id="lg-ac"></div>'
+          +'</div></div>'
+        +'<div class="lgf"><label>密码<span class="req">*</span></label>'
+          +'<input class="lg-inp" id="lg-pwd" type="password" placeholder="请输入密码" autocomplete="off"></div>'
+        +'<div class="lgf"><label>经办备注</label>'
+          +'<input class="lg-inp" id="lg-note" placeholder="选填，如：值班登录 / 代录"></div>'
+        +'<button class="btn-login" id="lg-btn">登 录</button>'
+        +'<p class="lg-hint">初始密码统一为 <b>Aa123456</b>，登录后可修改密码</p>'
+        +'<div class="roster"><div class="rt">系统用户（经办人）· 共 '+ACCOUNTS.length+' 个 · 点击自动填入</div>'
+          +'<div class="roster-note">以下为可登录本系统的乡、村两级经办人账号，'
+          +'<b>不是</b>退役军人档案中的服务对象；退役军人信息在登录后由各自权限范围查看。</div>'
+          +'<div class="roster-list">'+accRows+'</div></div>'
+      +'</div>'
+    +'</section>'
+  +'</div>';
+}
+function bindLogin(){
+  $('lg-btn').onclick=doLogin;
+  $('lg-pwd').onkeydown=function(e){if(e.key==='Enter')doLogin()};
+  /* 账号框：聚焦或输入即弹出「登录过的账号」下拉 */
+  var ph=$('lg-phone');
+  ph.onfocus=function(){showAc()};
+  ph.oninput=function(){showAc()};
+  ph.onkeydown=function(e){
+    var rows=document.querySelectorAll('#lg-ac .ai');
+    if(e.key==='ArrowDown'||e.key==='ArrowUp'){
+      var box=$('lg-ac');
+      if(box&&box.classList.contains('hide'))showAc();
+      rows=document.querySelectorAll('#lg-ac .ai');
+      if(!rows.length)return;
+      if(e.preventDefault)e.preventDefault();
+      AC_IDX=(e.key==='ArrowDown')?Math.min(AC_IDX+1,rows.length-1):Math.max(AC_IDX-1,0);
+      paintAc();return;
+    }
+    if(e.key==='Enter'){
+      if(AC_IDX>=0&&rows[AC_IDX]){pickAccount(rows[AC_IDX].getAttribute('data-pick'));return}
+      $('lg-pwd').focus();return;
+    }
+    if(e.key==='Escape'){hideAc();return}
+  };
+  Array.prototype.forEach.call(document.querySelectorAll('[data-fill]'),function(el){
+    el.onclick=function(){
+      $('lg-phone').value=el.getAttribute('data-fill');
+      $('lg-pwd').value='Aa123456';
+      hideAc();
+      $('lg-pwd').focus();
+    };
+  });
+  /* 一进登录页就自动弹出（本机有登录记录才弹） */
+  if(loadLoginHistory().length)showAc();
+}
+function doLogin(){
+  var ph=$('lg-phone').value.trim(), pw=$('lg-pwd').value, note=$('lg-note').value.trim();
+  if(!/^\d{11}$/.test(ph)){toast('请输入 11 位手机号','err');return}
+  var acc=null;
+  for(var i=0;i<ACCOUNTS.length;i++)if(ACCOUNTS[i].p===ph)acc=ACCOUNTS[i];
+  if(!acc){toast('该手机号不在数据权限表中','err');return}
+  var real=DB.passwords[ph]||'Aa123456';
+  if(pw!==real){toast('密码错误','err');return}
+  S.user={phone:ph,name:acc.n,v:acc.v,lv:acc.lv};
+  S.page=1;S.filters=null;S.showDeleted=false;
+  rememberLogin(ph);            /* 只记住账号，不记密码 */
+  if(note)DB.pageNotes['login-'+ph+'='+nowStr()]=note;
+  S.view='map';                 /* 需求：登录后进入全乡行政村分布图 */
+  if(acc.lv==='vil')S.village=acc.v;
+  render();
+  toast('登录成功，欢迎 '+acc.n,'ok');
+}
+
+/* ---------------- 顶部栏 ---------------- */
+function navItems(){
+  var pend=DB.warnings.filter(function(w){return !w.handled && canAccess(w.village)}).length;
+  /* 导航顺序：来访诉求、七包一 放在「预警记录」之后、「数据管理」之前；
+     七包一为乡级台账（含区级包案领导），与「数据管理」同为乡级专属功能。 */
+  if(S.user.lv==='town'){
+    return [['map','全乡地图'],['board','数据看板'],['warn','预警记录',pend],
+      ['visit','来访诉求'],['baoyi','七包一'],['data','数据管理']];
+  }
+  return [['map','全乡地图'],['village','本村台账'],['warn','预警记录',pend],['visit','来访诉求']];
+}
+function topbar(title,back){
+  var u=S.user;
+  var nav='<nav class="in nav">'+navItems().map(function(n){
+    var on=(S.view===n[0])||(n[0]==='map'&&S.view==='village'&&false);
+    if(n[0]==='village'&&S.view==='village')on=true;
+    return '<button class="nv'+(on?' on':'')+'" data-nav="'+n[0]+'">'+esc(n[1])
+      +(n[2]?'<span class="cnt">'+n[2]+'</span>':'')+'</button>';
+  }).join('')+'</nav>';
+  return '<div class="topbar"><div class="in">'
+    +(back?'<button class="btn sm ghost" id="tb-back">← 返回</button>':'')
+    +'<div class="brand"><div class="emblem"><svg viewBox="0 0 64 64" aria-hidden="true">'
+      +'<circle cx="32" cy="32" r="29" fill="none" stroke="#c9a227" stroke-width="3.2"/>'
+      +'<path d="'+STAR_PATH+'" fill="#c0392b"/></svg></div><div>'
+      +'<b>'+esc(title)+'</b>'
+      +'<span>向阳堡乡退役军人服务站信息管理系统</span>'
+    +'</div></div>'
+    +'<div class="spacer"></div>'
+    +'<div class="who"><b>'+esc(u.name)+'</b> <span class="tag '+(u.lv==='town'?'town':'vil')+'">'+(u.lv==='town'?'乡级权限':'村级权限')+'</span>'
+      +'<br>'+esc(u.v==='向阳堡乡'?'向阳堡乡（全乡）':u.v)+' · '+esc(u.phone)+'</div>'
+    +'<button class="btn sm" id="tb-pwd">修改密码</button>'
+    +'<button class="btn sm" id="tb-out">退出</button>'
+  +'</div>'+nav+'</div>';
+}
+function goto(v){
+  if(v==='map'){S.view='map';S.village=null}
+  else if(v==='village'){S.view='village';if(!S.village)S.village=(S.user.lv==='town'?VILLAGES[0]:S.user.v)}
+  else {S.view=v}
+  S.page=1;S.showDeleted=false;render();window.scrollTo(0,0);
+}
+/* 分页按钮（人员列表、来访诉求、七包一共用） */
+function bindPager(){
+  Array.prototype.forEach.call(document.querySelectorAll('[data-pg]'),function(b){
+    b.onclick=function(){
+      var p=parseInt(b.getAttribute('data-pg'),10);
+      if(p<1)return;S.page=p;render();window.scrollTo(0,0);
+    };
+  });
+}
+function bindTopbar(backFn){
+  if($('tb-back'))$('tb-back').onclick=backFn;
+  $('tb-pwd').onclick=openChangePwd;
+  $('tb-out').onclick=function(){
+    S.user=null;S.view='login';S.village=null;render();
+    toast('已退出登录');
+  };
+  Array.prototype.forEach.call(document.querySelectorAll('[data-nav]'),function(b){
+    b.onclick=function(){goto(b.getAttribute('data-nav'))};
+  });
+}
+function openChangePwd(){
+  openModal('<div class="mh"><b>修改密码</b><div class="spacer"></div><button class="x" data-close="1">✕</button></div>'
+    +'<div class="mb">'
+      +'<div class="grid2">'
+      +'<div><label class="fl">原密码<span class="req">*</span></label><input class="inp" id="pw0" type="password"></div>'
+      +'<div><label class="fl">新密码<span class="req">*</span></label><input class="inp" id="pw1" type="password" placeholder="不少于 6 位"></div>'
+      +'</div>'
+      +'<div class="mt12"><label class="fl">确认新密码<span class="req">*</span></label><input class="inp" id="pw2" type="password"></div>'
+      +'<div class="mt12"><label class="fl">备注</label><input class="inp" id="pw3" placeholder="选填，如：忘记原密码，经管理员重置"></div>'
+    +'</div>'
+    +'<div class="mf"><button class="btn" data-close="1">取消</button><button class="btn pri" id="pw-ok">确认修改</button></div>');
+  $('pw-ok').onclick=function(){
+    var a=$('pw0').value,b=$('pw1').value,c=$('pw2').value;
+    var real=DB.passwords[S.user.phone]||'Aa123456';
+    if(a!==real){toast('原密码不正确','err');return}
+    if(b.length<6){toast('新密码不少于 6 位','err');return}
+    if(b!==c){toast('两次输入的新密码不一致','err');return}
+    DB.passwords[S.user.phone]=b;saveDB();closeModal();
+    toast('密码修改成功，请牢记新密码','ok');
+  };
+}
+
+/* ---------------- 页面备注框 ---------------- */
+function noteBox(key,label,ph){
+  var val=DB.pageNotes[key]||'';
+  return '<div class="notebox mt16"><div class="nt">备注框 · '+esc(label||'页面备注')+'</div>'
+    +'<textarea class="inp" rows="2" data-note="'+esc(key)+'" placeholder="'+esc(ph||'填写本页面的备注信息，自动保存')+'">'+esc(val)+'</textarea></div>';
+}
+function bindNotes(){
+  Array.prototype.forEach.call(document.querySelectorAll('[data-note]'),function(el){
+    el.onblur=function(){
+      DB.pageNotes[el.getAttribute('data-note')]=el.value;saveDB();
+      toast('备注已保存');
+    };
+  });
+}
+
+/* ---------------- 视图：地图首页 ---------------- */
+function viewMap(){
+  var cards='';
+  if(S.user.lv==='town'){
+    var t=townStat();
+    cards=statCard('全乡退役军人','d-blue',t.veteran,'人')
+      +statCard('重点优抚对象','d-amber',t.key,'人')
+      +statCard('两参人员','d-red',t.lc,'人')
+      +statCard('建档总数','d-green',t.total,'人')
+      +statCard('已覆盖行政村','d-gray',t.covered+'/21','');
+  }else{
+    /* 村级权限：仅统计本村，不暴露全乡口径 */
+    var s=statOf(S.user.v);
+    cards=statCard(S.user.v+' 退役军人','d-blue',s.veteran,'人')
+      +statCard('重点优抚对象','d-amber',s.key,'人')
+      +statCard('两参人员','d-red',s.lc,'人')
+      +statCard('本村建档总数','d-green',s.total,'人')
+      +statCard('1 级风险人员','d-red',s.r1,'人');
+  }
+  /* 空白状态引导：全乡/本村尚无档案时提示如何开始 */
+  var total0=S.user.lv==='town'?townStat().total:statOf(S.user.v).total;
+  var guide=total0===0
+    ? '<div class="card mt16" style="padding:14px 16px;border-left:3px solid #c9a227;background:#fffdf6">'
+      +'<div class="tiny" style="line-height:1.95;color:#7a6a3a">'
+      +'<b style="color:#8a6d1f">当前为空白状态</b> —— 系统尚未录入任何人员档案。<br>'
+      +'点击地图上任意行政村版块进入该村，再点击右上角「＋ 新增人员」录入第一条记录。'
+      +'</div></div>'
+    : '';
+  /* 需求 1：乡级页面标题《向阳堡乡退役军人数据分布图》，动态显示建档立卡人数与重点优抚对象人数 */
+  var t0=S.user.lv==='town'?townStat():null;
+  var head=t0
+    ? '<div class="pagehead">'
+      +'<h1>《向阳堡乡退役军人数据分布图》</h1>'
+      +'<p class="ph-sub">建档立卡 <b>'+t0.total+'</b> 人'
+        +'<span class="sep">|</span>重点优抚对象 <b>'+t0.key+'</b> 人'
+        +'<span class="sep">|</span>已覆盖 <b>'+t0.covered+'</b> / 21 个行政村</p>'
+      +'</div>'
+    : '';
+  return topbar(S.user.lv==='town'?'全乡退役军人数据分布图':'全乡行政村分布图')
+    +'<div class="wrap" style="padding-bottom:28px">'
+      +head
+      +'<div class="stats mt16">'+cards+'</div>'
+      +guide
+      +'<div class="mt16">'+renderMap()+'</div>'
+      +'<div class="tiny muted3 mt12">点击任意行政村版块，进入该村人员信息详情页。'
+        +(S.user.lv==='vil'?'当前为村级权限（'+esc(S.user.v)+'），仅本村版块可点击。':'')+'</div>'
+      +noteBox('map','地图首页备注','例如：本月重点走访村、数据核对情况等')
+    +'</div>';
+}
+/* 统计卡。第 5 个参数 flag 传入时该卡可点击，跳转到「全乡人员列表」并带上对应筛选。 */
+function statCard(k,dot,v,u,flag){
+  var click=(flag!==undefined&&flag!==null);
+  return '<div class="stat'+(click?' click':'')+'"'+(click?' data-jump="'+esc(flag)+'"':'')+'>'
+    +'<div class="k"><span class="dot '+dot+'"></span>'+esc(k)
+    +(click?'<span class="jump">查看 ›</span>':'')+'</div>'
+    +'<div class="v">'+esc(v)+(u?'<span class="u">'+esc(u)+'</span>':'')+'</div></div>';
+}
+function bindMap(){
+  bindTopbar();
+  var tip=$('mtip');
+  Array.prototype.forEach.call(document.querySelectorAll('.vcell'),function(g){
+    var v=g.getAttribute('data-v');
+    g.onclick=function(){
+      if(!canAccess(v)){toast('当前为村级权限，仅可查看本村数据','err');return}
+      S.village=v;S.view='village';S.page=1;S.filters=null;render();
+      window.scrollTo(0,0);
+    };
+    g.onmouseenter=function(e){
+      if(!canAccess(v)){tip.innerHTML=esc(v)+'<br>无访问权限';}
+      else{
+        var s=statOf(v);
+        tip.innerHTML=esc(v)+'<br>退役军人 '+s.veteran+' · 重点优抚 '+s.key
+          +'<br>两参 '+s.lc+' · 兵支书 '+s.secretary
+          +'<br>风险 1级 '+s.r1+' / 2级 '+s.r2+' / 3级 '+s.r3+(s.r0?' / 未评定 '+s.r0:'');
+      }
+      tip.classList.add('on');
+    };
+    g.onmousemove=function(e){
+      var r=tip.parentNode.getBoundingClientRect();
+      var x=e.clientX-r.left+14,y=e.clientY-r.top+12;
+      if(x+tip.offsetWidth>r.width-6)x=e.clientX-r.left-tip.offsetWidth-14;
+      tip.style.left=x+'px';tip.style.top=y+'px';
+    };
+    g.onmouseleave=function(){tip.classList.remove('on')};
+  });
+  bindNotes();
+}
+
+/* ---------------- 视图：村级详情 ---------------- */
+/* ---------------- 人员列表：筛选 / 排序 / 表格（村级台账与全乡列表共用） ---------------- */
+function blankFilters(){return {kw:'',category:'',risk:'',secretary:'',political:'',flag:''}}
+function filterPersons(villages,f){
+  return DB.persons.filter(function(p){
+    if(villages.indexOf(p.village)<0)return false;
+    if(S.showDeleted){ if(p.status!==0)return false; } else { if(p.status!==1)return false; }
+    if(f.kw){
+      var kw=f.kw;
+      if(!((p.name||'').indexOf(kw)>=0||(p.phone||'').indexOf(kw)>=0
+        ||(p.idCard||'').indexOf(kw)>=0||(p.address||'').indexOf(kw)>=0))return false;
+    }
+    if(f.category&&p.category!==f.category)return false;
+    /* 风险筛选：''=全部，'0'=未评定，'1'/'2'/'3'=对应等级 */
+    if(f.risk!==''&&f.risk!=null&&String(p.riskLevel||0)!==String(f.risk))return false;
+    if(f.secretary&&p.isSecretary!==f.secretary)return false;
+    if(f.political&&p.political!==f.political)return false;
+    /* 快捷标签（看板统计卡跳转时带入） */
+    if(f.flag==='veteran'&&!catOf(p.category).veteran)return false;
+    if(f.flag==='key'&&!catOf(p.category).key)return false;
+    if(f.flag==='lc'&&!catOf(p.category).lc)return false;
+    if(f.flag==='risk1'&&p.riskLevel!==1)return false;
+    return true;
+  });
+}
+function catOptsHtml(f){
+  return '<option value="">全部类别</option>'+CAT_NAMES.map(function(c){
+    return '<option value="'+esc(c)+'"'+(f.category===c?' selected':'')+'>'+esc(c)+'</option>'}).join('');
+}
+function polOptsHtml(f){
+  return '<option value="">全部</option>'+POLITICAL.map(function(c){
+    return '<option value="'+esc(c)+'"'+(f.political===c?' selected':'')+'>'+esc(c)+'</option>'}).join('');
+}
+function filterPanelHtml(f,total){
+  return '<div class="card mt12 hide" id="v-filter"><div class="mb" style="padding:14px">'
+    +'<div class="filters">'
+      +'<div><label class="fl">关键字</label><input class="inp" id="f-kw" placeholder="姓名 / 电话 / 身份证 / 住址" value="'+esc(f.kw)+'"></div>'
+      +'<div><label class="fl">人员类别</label><select class="inp" id="f-cat">'+catOptsHtml(f)+'</select></div>'
+      +'<div><label class="fl">风险防控等级</label><select class="inp" id="f-risk">'
+        +'<option value="">全部</option>'
+        +'<option value="1"'+(f.risk==='1'?' selected':'')+'>1 级（高）</option>'
+        +'<option value="2"'+(f.risk==='2'?' selected':'')+'>2 级（中）</option>'
+        +'<option value="3"'+(f.risk==='3'?' selected':'')+'>3 级（低）</option>'
+        +'<option value="0"'+(f.risk==='0'?' selected':'')+'>未评定</option></select></div>'
+      +'<div><label class="fl">是否兵支书</label><select class="inp" id="f-sec">'
+        +'<option value="">全部</option>'
+        +'<option value="是"'+(f.secretary==='是'?' selected':'')+'>是</option>'
+        +'<option value="否"'+(f.secretary==='否'?' selected':'')+'>否</option></select></div>'
+      +'<div><label class="fl">政治面貌</label><select class="inp" id="f-pol">'+polOptsHtml(f)+'</select></div>'
+    +'</div>'
+    +'<div class="row mt12"><button class="btn pri" id="f-ok">查询</button>'
+      +'<button class="btn" id="f-reset">重置</button>'
+      +'<div class="spacer"></div><span class="tiny muted3">共匹配 '+total+' 条</span></div>'
+  +'</div></div>';
+}
+/* 人员表格：需求 3 —— 按风险等级排序（1 级在前、未评定最后），
+   1 级仅把「风险防控等级」这一格标红，不做整行标红。 */
+function personTableHtml(list,page,showVillage,emptyMsg){
+  var pageSize=20,total=list.length,pages=Math.max(1,Math.ceil(total/pageSize));
+  if(page>pages)page=pages;
+  if(page<1)page=1;
+  var start=(page-1)*pageSize;
+  var rows=sortByRisk(list).slice(start,start+pageSize);
+  var trs=rows.map(function(p,i){
+    return '<tr>'
+      +'<td>'+(start+i+1)+'</td>'
+      +(showVillage?'<td>'+esc(p.village)+'</td>':'')
+      +'<td><b>'+esc(p.name)+'</b></td>'
+      +'<td>'+esc(p.gender)+'</td>'
+      +'<td>'+esc(p.category)+'</td>'
+      +'<td>'+esc(p.political)+'</td>'
+      +'<td class="pw">'+esc(p.phone)+'</td>'
+      +'<td>'+esc(p.enlistDate||'—')+'</td>'
+      +'<td>'+esc(p.dischargeDate||'—')+'</td>'
+      +'<td>'+(p.isSecretary==='是'?'<span class="badge bg">是</span>':'否')+'</td>'
+      +'<td'+(p.riskLevel===1?' class="risk-hit"':'')+'>'+riskBadge(p.riskLevel)+'</td>'
+      +'<td class="muted3">'+esc(p.remark||'—')+'</td>'
+      +'<td><div class="ops">'
+        +(p.status===0
+          ? '<button class="btn sm" data-restore="'+p.id+'">恢复</button>'
+          : '<button class="btn sm" data-view="'+p.id+'">查看</button>'
+            +'<button class="btn sm" data-edit="'+p.id+'">编辑</button>'
+            +'<button class="btn sm warn" data-warn="'+p.id+'">预警</button>'
+            +'<button class="btn sm danger" data-del="'+p.id+'">删除</button>')
+      +'</div></td>'
+    +'</tr>';
+  }).join('');
+  var cols=showVillage?13:12;
+  return {total:total,pages:pages,page:page,
+    html:'<div class="tbl-wrap mt12">'
+    +'<table class="tbl"><thead><tr>'
+      +'<th style="width:44px">序号</th>'
+      +(showVillage?'<th>行政村</th>':'')
+      +'<th>姓名</th><th>性别</th><th>人员类别</th><th>政治面貌</th>'
+      +'<th>联系方式</th><th>入伍时间</th><th>退伍时间</th><th>兵支书</th>'
+      +'<th class="risk-th">风险防控等级 <span class="rl rl1">1级</span><span class="rl rl2">2级</span><span class="rl rl3">3级</span></th>'
+      +'<th>备注</th><th style="width:210px">操作</th>'
+    +'</tr></thead><tbody>'+(trs||'<tr><td colspan="'+cols+'"><div class="empty">'+emptyMsg+'</div></td></tr>')+'</tbody></table>'
+    +'</div>'
+    +'<div class="pager">'
+      +'<span>共 '+total+' 条，第 '+page+'/'+pages+' 页</span>'
+      +'<button class="pg" data-pg="1">首页</button>'
+      +'<button class="pg" data-pg="'+(page-1)+'">上一页</button>'
+      +'<button class="pg" data-pg="'+(page+1)+'">下一页</button>'
+      +'<button class="pg" data-pg="'+pages+'">末页</button>'
+    +'</div>'};
+}
+
+/* ---------------- 视图：村级详情 ---------------- */
+function viewVillage(){
+  var v=S.village;
+  if(!S.filters)S.filters=blankFilters();
+  var s=statOf(v);
+  var f=S.filters;
+  var list=filterPersons([v],f);
+  var tbl=personTableHtml(list,S.page,false,'本村暂未录入人员档案<br><span style="font-size:12px">点击右上角「＋ 新增人员」录入第一条记录</span>');
+  S.page=tbl.page;
+
+  return topbar(v+' · 人员信息详情',true)
+    +'<div class="wrap" style="padding-bottom:28px">'
+      +'<div class="stats mt16">'
+        +statCard('退役军人','d-blue',s.veteran,'人')
+        +statCard('重点优抚对象','d-amber',s.key,'人')
+        +statCard('两参人员','d-red',s.lc,'人')
+        +statCard('党员','d-green',s.party,'人')
+        +statCard('兵支书','d-gray',s.secretary,'人')
+      +'</div>'
+      +'<div class="row mt16">'
+        +'<button class="btn pri" id="v-add">＋ 新增人员</button>'
+        +'<button class="btn" id="v-query">查询</button>'
+        +'<button class="btn" id="v-export">导出</button>'
+        +'<button class="btn" id="v-import">Excel 模板导入</button>'
+        +'<button class="btn" id="v-tpl">下载导入模板</button>'
+        +'<div class="spacer"></div>'
+        +'<button class="btn" id="v-delmode">批量删除</button>'
+        +'<button class="btn ghost" id="v-deleted">'+(S.showDeleted?'← 返回正常列表':'查看已删除')+'</button>'
+      +'</div>'
+      +filterPanelHtml(f,tbl.total)
+      +'<div class="card mt12" style="padding:12px 14px">'
+        +'<div class="row"><div class="tiny muted">'+esc(v)+' · 共 <b style="color:#1e2430">'+tbl.total+'</b> 条记录'
+          +(S.showDeleted?'（已删除数据）':'')
+          +'　<span class="tiny muted3">列表已按风险等级排序，1 级在前</span></div>'
+          +'<div class="spacer"></div>'
+          +'<span class="tiny muted3">'+(S.showDeleted?'软删除留痕，可恢复':'删除为软删除，数据保留留痕')+'</span></div>'
+      +'</div>'
+      +tbl.html
+      +noteBox('village-'+v, v+' 页面备注','例如：数据核对说明、走访计划等')
+    +'</div>';
+}
+/* 人员列表页公共交互：筛选栏、分页、行内操作（村级台账 / 全乡列表共用）
+   slot = 'filters' | 'filtersAll'，让两个页面各自记住自己的筛选条件 */
+function bindListCommon(backFn,slot){
+  bindTopbar(backFn);
+  var fok=$('f-ok');
+  if(fok)fok.onclick=function(){
+    var f=S[slot]||blankFilters();
+    f.kw=$('f-kw').value.trim();f.category=$('f-cat').value;f.risk=$('f-risk').value;
+    f.secretary=$('f-sec').value;f.political=$('f-pol').value;
+    S[slot]=f;S.page=1;render();
+  };
+  var fr=$('f-reset');
+  if(fr)fr.onclick=function(){
+    var f=blankFilters();
+    f.flag=(S[slot]&&S[slot].flag)||'';   /* 重置保留快捷标签，标签本身在页面上可见 */
+    S[slot]=f;S.page=1;render();
+  };
+  var fkw=$('f-kw');
+  if(fkw)fkw.onkeydown=function(e){if(e.key==='Enter')fok.click()};
+  bindPager();
+  Array.prototype.forEach.call(document.querySelectorAll('[data-view]'),function(b){
+    b.onclick=function(){openDetail(b.getAttribute('data-view'))};
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-edit]'),function(b){
+    b.onclick=function(){
+      S.editId=b.getAttribute('data-edit');
+      S.formFrom=(slot==='filtersAll'?'all':'village');
+      S.view='form';render();window.scrollTo(0,0);
+    };
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-warn]'),function(b){
+    b.onclick=function(){openWarn(b.getAttribute('data-warn'))};
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-del]'),function(b){
+    b.onclick=function(){openDelete(b.getAttribute('data-del'))};
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-restore]'),function(b){
+    b.onclick=function(){
+      var p=findP(b.getAttribute('data-restore'));
+      if(!p)return;
+      p.status=1;p.updatedAt=nowStr();saveDB();render();
+      toast('已恢复该条数据','ok');
+    };
+  });
+  bindNotes();
+}
+function bindVillage(){
+  bindListCommon(function(){S.view='map';S.village=null;render();window.scrollTo(0,0)},'filters');
+  $('v-add').onclick=function(){S.editId=null;S.formFrom='village';S.view='form';render();window.scrollTo(0,0)};
+  $('v-query').onclick=function(){$('v-filter').classList.toggle('hide')};
+  $('v-export').onclick=doExport;
+  $('v-import').onclick=doImport;
+  $('v-tpl').onclick=doTemplate;
+  $('v-delmode').onclick=doBatchDelete;
+  $('v-deleted').onclick=function(){S.showDeleted=!S.showDeleted;S.page=1;render()};
+}
+
+/* ---------------- 视图：全乡人员列表（看板统计卡点击跳转的目标页） ---------------- */
+function viewAll(){
+  if(!S.filtersAll)S.filtersAll=blankFilters();
+  var f=S.filtersAll;
+  var scope=visibleVillages();
+  var list=filterPersons(scope,f);
+  var tbl=personTableHtml(list,S.page,true,'当前筛选条件下没有人员档案');
+  S.page=tbl.page;
+  var t=townStat();
+  var chips='<div class="chips mt12">'+[['','全部人员'],['veteran','退役军人'],
+    ['key','重点优抚对象'],['lc','两参人员'],['risk1','1 级风险']].map(function(x){
+    return '<button class="chip'+((f.flag||'')===x[0]?' on':'')+'" data-flag="'+x[0]+'">'+esc(x[1])+'</button>';
+  }).join('')+'</div>';
+  return topbar(S.user.lv==='town'?'全乡人员列表':(S.user.v+' · 人员列表'))
+    +'<div class="wrap" style="padding-bottom:28px">'
+      +'<div class="stats mt16">'
+        +statCard('建档总数','d-blue',t.total,'人')
+        +statCard('退役军人','d-blue',t.veteran,'人')
+        +statCard('重点优抚对象','d-amber',t.key,'人')
+        +statCard('两参人员','d-red',t.lc,'人')
+        +statCard('1 级风险','d-red',t.r1,'人')
+        +statCard('覆盖行政村','d-gray',t.covered+'/21','')
+      +'</div>'
+      +chips
+      +'<div class="row mt12">'
+        +'<button class="btn" id="v-query">查询</button>'
+        +'<button class="btn" id="a-export">导出当前列表</button>'
+        +'<div class="spacer"></div>'
+        +'<button class="btn ghost" id="v-deleted">'+(S.showDeleted?'← 返回正常列表':'查看已删除')+'</button>'
+      +'</div>'
+      +filterPanelHtml(f,tbl.total)
+      +'<div class="card mt12" style="padding:12px 14px"><div class="row">'
+        +'<div class="tiny muted">共 <b style="color:#1e2430">'+tbl.total+'</b> 条记录'
+          +(S.showDeleted?'（已删除数据）':'')
+          +'　<span class="tiny muted3">列表已按风险等级排序，1 级在前</span></div>'
+        +'<div class="spacer"></div><span class="tiny muted3">统计范围：'+scope.length+' 个行政村</span></div></div>'
+      +tbl.html
+      +noteBox('all','全乡人员列表页面备注','例如：本次筛选口径、上报说明')
+    +'</div>';
+}
+function bindAll(){
+  bindListCommon(function(){S.view='board';render();window.scrollTo(0,0)},'filtersAll');
+  $('v-query').onclick=function(){$('v-filter').classList.toggle('hide')};
+  $('v-deleted').onclick=function(){S.showDeleted=!S.showDeleted;S.page=1;render()};
+  $('a-export').onclick=doExportAllList;
+  Array.prototype.forEach.call(document.querySelectorAll('[data-flag]'),function(b){
+    b.onclick=function(){
+      var f=S.filtersAll||blankFilters();
+      f.flag=b.getAttribute('data-flag')||'';
+      S.filtersAll=f;S.page=1;render();
+    };
+  });
+}
+/* 导出「全乡人员列表」当前筛选结果 */
+function doExportAllList(){
+  var list=sortByRisk(filterPersons(visibleVillages(),S.filtersAll||blankFilters()));
+  if(!list.length){toast('当前无可导出数据','err');return}
+  var rows=[IMPORT_HEADERS].concat(list.map(rowOf));
+  var fname=(S.user.lv==='town'?'向阳堡乡':'')+'人员列表_'+today();
+  if(window.XLSX){
+    var ws=XLSX.utils.aoa_to_sheet(rows);
+    ws['!cols']=[{wch:12},{wch:10},{wch:6},{wch:20},{wch:22},{wch:14},{wch:16},{wch:12},{wch:12},{wch:12},{wch:9},{wch:14},{wch:12},{wch:36},{wch:44},{wch:18}];
+    var wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'人员列表');
+    XLSX.writeFile(wb,fname+'.xlsx');
+  }else{
+    downloadBlob(new Blob([toCSV(rows)],{type:'text/csv;charset=utf-8'}),fname+'.csv');
+  }
+  toast('已导出 '+list.length+' 条','ok');
+}
+function findP(id){for(var i=0;i<DB.persons.length;i++)if(DB.persons[i].id===id)return DB.persons[i];return null}
+function findVisit(id){for(var i=0;i<DB.visits.length;i++)if(DB.visits[i].id===id)return DB.visits[i];return null}
+function findBaoyi(id){for(var i=0;i<DB.baoyi.length;i++)if(DB.baoyi[i].id===id)return DB.baoyi[i];return null}
+
+/* ---------------- 人员表单 ---------------- */
+function field(label,id,val,type,req,ph){
+  return '<div><label class="fl">'+esc(label)+(req?'<span class="req">*</span>':'')+'</label>'
+    +'<input class="inp" id="'+id+'" type="'+(type||'text')+'" value="'+esc(val||'')+'" placeholder="'+esc(ph||'')+'"></div>';
+}
+function selectField(label,id,val,opts,req){
+  return '<div><label class="fl">'+esc(label)+(req?'<span class="req">*</span>':'')+'</label>'
+    +'<select class="inp" id="'+id+'">'+opts.map(function(o){
+      return '<option value="'+esc(o)+'"'+(val===o?' selected':'')+'>'+esc(o)+'</option>'}).join('')+'</select></div>';
+}
+function viewForm(){
+  var isEdit=!!S.editId;
+  var p=isEdit?findP(S.editId):newPerson(S.village);
+  if(!p)p=newPerson(S.village);          /* 结构统一由 newPerson 派生，不会漏字段 */
+  if(!isEdit&&!p.village)p.village=S.village;
+
+  return topbar((isEdit?'编辑人员信息':'新增人员信息')+' · '+esc(p.village),true)
+    +'<div class="wrap" style="padding-bottom:28px">'
+      +'<div class="card mt16" style="padding:18px">'
+        +'<div class="sect">一、基本信息</div>'
+        +'<div class="basic">'
+          +'<div>'
+            +'<div class="grid3">'
+              +field('姓名','fm-name',p.name,'text',true,isEdit?'姓名不可修改':'请输入姓名')
+              +selectField('性别','fm-gender',p.gender,['男','女'],true)
+              +field('身份证号','fm-idc',p.idCard,'text',true,'18 位身份证号')
+            +'</div>'
+            +'<div class="grid3 mt12">'
+              +field('联系方式','fm-phone',p.phone,'text',true,'11 位手机号')
+              +selectField('人员类别','fm-cat',p.category,CAT_NAMES,true)
+              +selectField('政治面貌','fm-pol',p.political,POLITICAL,true)
+            +'</div>'
+            +'<div class="mt12">'+field('家庭住址','fm-addr',p.address,'text',true,'如：'+p.village+'3组18号')+'</div>'
+          +'</div>'
+          /* 需求 4：人员信息录入时添加人员照片 */
+          +'<div class="idphoto">'
+            +'<div class="frame'+(p.photo?' has':'')+'" id="fm-photo-frame">'
+              +(p.photo?'<img src="'+p.photo+'" alt="人员照片">'
+                :'<div class="ph-empty">人员照片<br>未上传</div>')
+            +'</div>'
+            +'<div class="cap">'+(p.photo?'点击照片可放大预览':'支持 jpg / png，自动压缩')+'</div>'
+            +'<div class="acts">'
+              +'<button class="btn sm" id="fm-photo-up">'+(p.photo?'更换':'上传')+'</button>'
+              +(p.photo?'<button class="btn sm danger" id="fm-photo-rm">删除</button>':'')
+            +'</div>'
+          +'</div>'
+        +'</div>'
+
+        +'<div class="sect">二、军旅信息</div>'
+        +'<div class="grid3">'
+          +field('入伍时间','fm-enlist',p.enlistDate,'date')
+          +field('退伍时间','fm-discharge',p.dischargeDate,'date')
+          +selectField('是否是兵支书','fm-sec',p.isSecretary,['是','否'])
+        +'</div>'
+        +'<div class="grid2 mt12">'
+          +field('立功信息','fm-merit',p.merit,'text',false,'如：三等功 / 二等功 / 嘉奖')
+          /* 需求 8：风险等级不是必填项，未填写即为「未评定」 */
+          +'<div><label class="fl">风险防控等级 <span class="tiny muted3" style="font-weight:400">（选填）</span></label>'
+            +'<select class="inp" id="fm-risk">'
+            +[[0,'未评定（暂不填写）'],[1,'1 级（高风险 · 标红）'],[2,'2 级（中风险 · 标黄）'],[3,'3 级（低风险 · 标蓝）']].map(function(o){
+              return '<option value="'+o[0]+'"'+((+p.riskLevel||0)===o[0]?' selected':'')+'>'+esc(o[1])+'</option>'
+            }).join('')
+          +'</select></div>'
+        +'</div>'
+        +'<div class="tiny mt12" style="line-height:2">'
+          +'<span class="badge b1">1 级 · 高风险</span> 越级上访、集体上访、过激行为、媒体高度关注、涉及重大利益或群体性事件隐患，通常需主要领导包案或多部门联动处置。<br>'
+          +'<span class="badge b2">2 级 · 中风险</span> 案情相对复杂、矛盾持续时间较长、有一定上访可能性或当事人情绪较激烈，通常由部门负责人或分管领导协调处理。<br>'
+          +'<span class="badge b3">3 级 · 低风险</span> 事实清楚、争议单一、当事人情绪稳定、初次信访或咨询类事项，通常由承办人或具体业务部门直接处理。'
+        +'</div>'
+
+        +'<div class="sect">三、家庭成员信息 <span class="tiny muted3" style="font-weight:400">（可动态添加，条数不限）</span></div>'
+        +'<div id="fam-list"></div>'
+        +'<button class="btn sm" id="fam-add">＋ 添加家庭成员</button>'
+
+        +'<div class="sect">四、常态化联系信息 <span class="tiny muted3" style="font-weight:400">（可动态添加）</span></div>'
+        +'<div id="ct-list"></div>'
+        +'<button class="btn sm" id="ct-add">＋ 添加联系记录</button>'
+
+        /* 需求 5：动态帮扶记录（帮扶时间 / 帮扶措施 / 备注 / 附件照片，可多条） */
+        +'<div class="sect">五、帮扶记录 <span class="tiny muted3" style="font-weight:400">（可动态添加，条数不限）</span></div>'
+        +'<div id="aid-list"></div>'
+        +'<button class="btn sm" id="aid-add">＋ 添加帮扶记录</button>'
+
+        +'<div class="sect">六、备注</div>'
+        +'<textarea class="inp" id="fm-remark" rows="3" placeholder="填写本条人员信息的备注">'+esc(p.remark||'')+'</textarea>'
+      +'</div>'
+      +'<div class="row mt16">'
+        +'<button class="btn pri" id="fm-save" style="height:38px;padding:0 26px">保存</button>'
+        +'<button class="btn" id="fm-cancel" style="height:38px">取消</button>'
+      +'</div>'
+      +noteBox('form-'+p.village,'人员表单页面备注','例如：本批次录入来源、审核人等')
+    +'</div>';
+}
+function bindForm(){
+  var back=S.formFrom||'village';
+  bindTopbar(function(){S.view=back;S.editId=null;render();window.scrollTo(0,0)});
+  var isEdit=!!S.editId;
+  /* 新增时同样必须带上 village：否则保存后 village 为空，
+     列表按村过滤永远匹配不上，表现为「新增没生效」。
+     这里统一走 newPerson()，与 viewForm() 同源，不会漏字段。 */
+  var p=isEdit?findP(S.editId):newPerson(S.village);
+  if(!p)p=newPerson(S.village);
+  if(isEdit)$('fm-name').setAttribute('readonly','readonly');
+  var fam=p.family?clone(p.family):[], cts=p.contacts?clone(p.contacts):[];
+  var aids=p.aids?clone(p.aids):[], photo=p.photo||'';
+
+  function drawFam(){
+    $('fam-list').innerHTML=fam.map(function(f,i){
+      return '<div class="sub-item">'
+        +'<button class="btn sm danger del" data-fdel="'+i+'">移除</button>'
+        +'<div class="grid3">'
+          +'<div><label class="fl">姓名</label><input class="inp" data-fk="name" data-fi="'+i+'" value="'+esc(f.name)+'"></div>'
+          +'<div><label class="fl">关系</label><select class="inp" data-fk="relation" data-fi="'+i+'">'
+            +RELATIONS.map(function(r){return '<option value="'+esc(r)+'"'+(f.relation===r?' selected':'')+'>'+esc(r)+'</option>'}).join('')+'</select></div>'
+          +'<div><label class="fl">联系方式</label><input class="inp" data-fk="phone" data-fi="'+i+'" value="'+esc(f.phone)+'"></div>'
+        +'</div>'
+        /* 需求 7：家庭成员信息栏添加家庭住址 */
+        +'<div class="mt12"><label class="fl">家庭住址</label><input class="inp" data-fk="address" data-fi="'+i+'" value="'+esc(f.address||'')+'" placeholder="如：'+esc(p.village)+'3组18号"></div>'
+        +'<div class="mt12"><label class="fl">备注</label><input class="inp" data-fk="remark" data-fi="'+i+'" value="'+esc(f.remark||'')+'"></div>'
+      +'</div>';
+    }).join('')||'<div class="tiny muted3" style="padding:6px 0 12px">暂无家庭成员，可点击下方按钮添加。</div>';
+    bindSubInputs('f');
+  }
+  function drawCt(){
+    $('ct-list').innerHTML=cts.map(function(c,i){
+      return '<div class="sub-item">'
+        +'<button class="btn sm danger del" data-cdel="'+i+'">移除</button>'
+        +'<div class="grid3">'
+          +'<div><label class="fl">走访时间</label><input class="inp" type="date" data-ck="date" data-ci="'+i+'" value="'+esc(c.date)+'"></div>'
+          +'<div><label class="fl">走访方式</label><select class="inp" data-ck="method" data-ci="'+i+'">'
+            +METHODS.map(function(m){return '<option value="'+esc(m)+'"'+(c.method===m?' selected':'')+'>'+esc(m)+'</option>'}).join('')+'</select></div>'
+          +'<div><label class="fl">是否有固定收入</label><select class="inp" data-ck="fixedIncome" data-ci="'+i+'">'
+            +['是','否'].map(function(m){return '<option value="'+esc(m)+'"'+(c.fixedIncome===m?' selected':'')+'>'+esc(m)+'</option>'}).join('')+'</select></div>'
+        +'</div>'
+        +'<div class="mt12"><label class="fl">记录联系情况</label><textarea class="inp" rows="2" data-ck="situation" data-ci="'+i+'">'+esc(c.situation||'')+'</textarea></div>'
+        +'<div class="mt12"><label class="fl">走访照片 <span class="muted3">（仅“实地走访”需上传，支持多张）</span></label>'
+          +'<div class="photos">'
+            +(c.photos||[]).map(function(src,j){
+              return '<div class="ph"><img src="'+src+'"><button class="rm" data-crm="'+i+'-'+j+'">✕</button></div>'}).join('')
+            +((c.method==='实地走访')?'<button class="uploader" data-cup="'+i+'">＋<span>上传照片</span></button>'
+              :'<span class="tiny muted3" style="align-self:center">选择“实地走访”后可上传照片</span>')
+          +'</div>'
+        +'</div>'
+      +'</div>';
+    }).join('')||'<div class="tiny muted3" style="padding:6px 0 12px">暂无联系记录，可点击下方按钮添加。</div>';
+    bindSubInputs('c');
+  }
+  function bindSubInputs(t){
+    Array.prototype.forEach.call(document.querySelectorAll('[data-'+t+'k]'),function(el){
+      var i=+el.getAttribute('data-'+t+'i'), k=el.getAttribute('data-'+t+'k');
+      var handler=function(){
+        if(t==='f')fam[i][k]=el.value;
+        else if(t==='a')aids[i][k]=el.value;
+        else{
+          var old=cts[i][k];cts[i][k]=el.value;
+          if(k==='method'&&old!==el.value){drawCt()}
+        }
+      };
+      el.onchange=handler;el.oninput=handler;
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-'+t+'del]'),function(b){
+      b.onclick=function(){
+        var i=+b.getAttribute('data-'+t+'del');
+        if(t==='f'){fam.splice(i,1);drawFam()}
+        else if(t==='a'){aids.splice(i,1);drawAid()}
+        else{cts.splice(i,1);drawCt()}
+      };
+    });
+    if(t==='c'){
+      Array.prototype.forEach.call(document.querySelectorAll('[data-cup]'),function(b){
+        b.onclick=function(){pickPhotos(+b.getAttribute('data-cup'))};
+      });
+      Array.prototype.forEach.call(document.querySelectorAll('[data-crm]'),function(b){
+        b.onclick=function(){
+          var a=b.getAttribute('data-crm').split('-');
+          cts[+a[0]].photos.splice(+a[1],1);drawCt();
+        };
+      });
+    }
+    if(t==='a'){
+      Array.prototype.forEach.call(document.querySelectorAll('[data-aup]'),function(b){
+        b.onclick=function(){pickAidPhotos(+b.getAttribute('data-aup'))};
+      });
+      Array.prototype.forEach.call(document.querySelectorAll('[data-arm]'),function(b){
+        b.onclick=function(){
+          var a=b.getAttribute('data-arm').split('-');
+          aids[+a[0]].photos.splice(+a[1],1);drawAid();
+        };
+      });
+    }
+  }
+  function pickPhotos(ci){
+    var inp=document.createElement('input');
+    inp.type='file';inp.accept='image/*';inp.multiple=true;
+    inp.onchange=function(){
+      var files=Array.prototype.slice.call(inp.files||[]);
+      if(!files.length)return;
+      var left=files.length;
+      files.forEach(function(f){
+        compressImage(f,function(dataUrl){
+          if(!cts[ci].photos)cts[ci].photos=[];
+          cts[ci].photos.push(dataUrl);
+          left--;if(left===0){drawCt();toast('照片已添加（缩略图）','ok')}
+        });
+      });
+    };
+    inp.click();
+  }
+  /* 需求 5：帮扶记录 —— 帮扶时间 / 帮扶措施 / 备注 / 附件照片，可多条 */
+  function drawAid(){
+    $('aid-list').innerHTML=aids.map(function(a,i){
+      return '<div class="sub-item">'
+        +'<button class="btn sm danger del" data-adel="'+i+'">移除</button>'
+        +'<div class="grid3">'
+          +'<div><label class="fl">帮扶时间</label><input class="inp" type="date" data-ak="date" data-ai="'+i+'" value="'+esc(a.date||'')+'"></div>'
+        +'</div>'
+        +'<div class="mt12"><label class="fl">帮扶措施</label>'
+          +'<textarea class="inp" rows="3" data-ak="measure" data-ai="'+i+'" placeholder="例如：协调民政部门办理临时救助；发放米面油等生活物资；联系医院安排体检">'+esc(a.measure||'')+'</textarea></div>'
+        +'<div class="mt12"><label class="fl">备注</label><input class="inp" data-ak="remark" data-ai="'+i+'" value="'+esc(a.remark||'')+'" placeholder="选填"></div>'
+        +'<div class="mt12"><label class="fl">附件照片 <span class="muted3">（支持多张）</span></label>'
+          +'<div class="photos">'
+            +(a.photos||[]).map(function(src,j){
+              return '<div class="ph"><img src="'+src+'"><button class="rm" data-arm="'+i+'-'+j+'">✕</button></div>'}).join('')
+            +'<button class="uploader" data-aup="'+i+'">＋<span>上传照片</span></button>'
+          +'</div>'
+        +'</div>'
+      +'</div>';
+    }).join('')||'<div class="tiny muted3" style="padding:6px 0 12px">暂无帮扶记录，可点击下方按钮添加。</div>';
+    bindSubInputs('a');
+  }
+  function pickAidPhotos(ai){
+    var inp=document.createElement('input');
+    inp.type='file';inp.accept='image/*';inp.multiple=true;
+    inp.onchange=function(){
+      var files=Array.prototype.slice.call(inp.files||[]);
+      if(!files.length)return;
+      var left=files.length;
+      files.forEach(function(f){
+        compressImage(f,function(dataUrl){
+          if(!aids[ai].photos)aids[ai].photos=[];
+          aids[ai].photos.push(dataUrl);
+          left--;if(left===0){drawAid();toast('帮扶照片已添加（缩略图）','ok')}
+        });
+      });
+    };
+    inp.click();
+  }
+
+  /* 需求 4：人员照片（单张） */
+  function drawPhoto(){
+    var fr=$('fm-photo-frame');
+    fr.className='frame'+(photo?' has':'');
+    fr.innerHTML=photo?'<img src="'+photo+'" alt="人员照片">'
+      :'<div class="ph-empty">人员照片<br>未上传</div>';
+    var cap=document.querySelector('.idphoto .cap');
+    if(cap)cap.textContent=photo?'点击照片可放大预览':'支持 jpg / png，自动压缩';
+    var acts=document.querySelector('.idphoto .acts');
+    if(acts)acts.innerHTML='<button class="btn sm" id="fm-photo-up">'+(photo?'更换':'上传')+'</button>'
+      +(photo?'<button class="btn sm danger" id="fm-photo-rm">删除</button>':'');
+    bindPhotoActs();
+  }
+  function bindPhotoActs(){
+    var up=$('fm-photo-up');if(up)up.onclick=pickIdPhoto;
+    var rm=$('fm-photo-rm');
+    if(rm)rm.onclick=function(){photo='';drawPhoto();toast('已移除人员照片')};
+  }
+  function pickIdPhoto(){
+    var inp=document.createElement('input');
+    inp.type='file';inp.accept='image/*';
+    inp.onchange=function(){
+      var f=inp.files&&inp.files[0];if(!f)return;
+      compressImage(f,function(dataUrl){
+        if(!dataUrl){toast('照片读取失败，请换一张','err');return}
+        photo=dataUrl;drawPhoto();toast('人员照片已上传','ok');
+      });
+    };
+    inp.click();
+  }
+
+  drawFam();drawCt();drawAid();drawPhoto();
+  $('fam-add').onclick=function(){fam.push({name:'',relation:'配偶',phone:'',address:'',remark:''});drawFam()};
+  $('ct-add').onclick=function(){cts.push({date:today(),situation:'',method:'电话',fixedIncome:'否',photos:[]});drawCt()};
+  $('aid-add').onclick=function(){aids.push({date:today(),measure:'',remark:'',photos:[]});drawAid()};
+
+  $('fm-cancel').onclick=function(){S.view=back;S.editId=null;render();window.scrollTo(0,0)};
+  $('fm-save').onclick=function(){
+    var name=$('fm-name').value.trim(),phone=$('fm-phone').value.trim(),idc=$('fm-idc').value.trim();
+    if(!name){toast('请填写姓名','err');return}
+    if(!/^\d{11}$/.test(phone)){toast('联系方式须为 11 位手机号','err');return}
+    if(idc&&!/^\d{17}[\dXx]$/.test(idc)){toast('身份证号格式不正确','err');return}
+    if(idc&&idCardCheck(idc.slice(0,17))!==idc.slice(17).toUpperCase()){toast('身份证号校验位不正确，请核对','err');return}
+    /* 以 newPerson() 为底，保证 village 及全部字段都在（含新增的 photo / aids） */
+    var obj=newPerson(p.village||S.village);
+    obj.name=name; obj.gender=$('fm-gender').value; obj.idCard=idc;
+    obj.address=$('fm-addr').value.trim(); obj.phone=phone; obj.category=$('fm-cat').value;
+    obj.political=$('fm-pol').value; obj.enlistDate=$('fm-enlist').value;
+    obj.dischargeDate=$('fm-discharge').value; obj.isSecretary=$('fm-sec').value;
+    obj.merit=$('fm-merit').value.trim();
+    obj.riskLevel=+$('fm-risk').value||0;      /* 需求 8：可不填，0 = 未评定 */
+    obj.photo=photo; obj.family=fam; obj.contacts=cts; obj.aids=aids;
+    obj.remark=$('fm-remark').value.trim();
+    if(isEdit){
+      var t=findP(S.editId);
+      var keepName=t.name;
+      Object.keys(obj).forEach(function(k){t[k]=obj[k]});
+      t.name=keepName;           /* 姓名不可编辑 */
+      t.updatedAt=nowStr();
+    }else{
+      obj.id='P'+uid();obj.status=1;obj.delReason='';obj.delAt='';
+      obj.createdAt=today();obj.updatedAt='';
+      DB.persons.push(obj);
+    }
+    saveDB();
+    S.view=back;S.editId=null;render();window.scrollTo(0,0);
+    toast(isEdit?'保存成功':'新增成功','ok');
+  };
+  bindNotes();
+}
+function compressImage(file,cb){
+  var r=new FileReader();
+  r.onload=function(){
+    var img=new Image();
+    img.onload=function(){
+      var max=560,w=img.width,h=img.height;
+      if(w>h&&w>max){h=Math.round(h*max/w);w=max}
+      else if(h>=w&&h>max){w=Math.round(w*max/h);h=max}
+      var cv=document.createElement('canvas');cv.width=w;cv.height=h;
+      cv.getContext('2d').drawImage(img,0,0,w,h);
+      cb(cv.toDataURL('image/jpeg',0.62));
+    };
+    img.onerror=function(){cb('')};
+    img.src=r.result;
+  };
+  r.readAsDataURL(file);
+}
+
+/* ---------------- 详情 ---------------- */
+function openDetail(id){
+  var p=findP(id);if(!p)return;
+  var fam=(p.family||[]).map(function(f){
+    return '<div class="sub-item"><div class="row"><b>'+esc(f.name||'—')+'</b>'
+      +'<span class="badge bgray">'+esc(f.relation||'—')+'</span>'
+      +'<span class="pw tiny muted">'+esc(f.phone||'—')+'</span></div>'
+      +(f.address?'<div class="tiny muted mt12">家庭住址：'+esc(f.address)+'</div>':'')
+      +(f.remark?'<div class="tiny muted mt12">备注：'+esc(f.remark)+'</div>':'')+'</div>';
+  }).join('')||'<div class="tiny muted3">无</div>';
+  var cts=(p.contacts||[]).map(function(c){
+    return '<div class="sub-item"><div class="row">'
+      +'<b>'+esc(c.date||'—')+'</b><span class="badge b3">'+esc(c.method||'—')+'</span>'
+      +'<span class="tiny muted">固定收入：'+esc(c.fixedIncome||'—')+'</span></div>'
+      +'<div class="tiny mt12">'+esc(c.situation||'—')+'</div>'
+      +((c.photos&&c.photos.length)?'<div class="photos">'+c.photos.map(function(s){return '<div class="ph"><img src="'+s+'"></div>'}).join('')+'</div>':'')
+    +'</div>';
+  }).join('')||'<div class="tiny muted3">无</div>';
+  /* 需求 5：帮扶记录 */
+  var aids=(p.aids||[]).map(function(a){
+    return '<div class="sub-item"><div class="row"><b>'+esc(a.date||'—')+'</b>'
+      +'<span class="badge bgray">帮扶记录</span></div>'
+      +'<div class="tiny mt12" style="line-height:1.9"><span class="muted3">帮扶措施：</span>'+esc(a.measure||'—')+'</div>'
+      +(a.remark?'<div class="tiny muted mt12">备注：'+esc(a.remark)+'</div>':'')
+      +((a.photos&&a.photos.length)?'<div class="photos">'+a.photos.map(function(s){return '<div class="ph"><img src="'+s+'"></div>'}).join('')+'</div>':'')
+    +'</div>';
+  }).join('')||'<div class="tiny muted3">无</div>';
+  /* 需求 4 + 6：人员照片，点击放大 */
+  var photo=p.photo
+    ? '<div class="idphoto" style="flex:none"><div class="frame has" style="width:104px;height:132px">'
+      +'<img src="'+p.photo+'" alt="人员照片"></div><div class="cap">点击放大</div></div>'
+    : '';
+
+  openModal('<div class="mh"><b>'+esc(p.name)+' · 人员信息详情</b>'
+      +riskBadge(p.riskLevel)
+      +'<div class="spacer"></div><button class="x" data-close="1">✕</button></div>'
+    +'<div class="mb">'
+      +'<div class="sect">基本信息</div>'
+      +'<div style="display:flex;gap:18px;align-items:flex-start">'
+        +'<div class="kv" style="flex:1">'
+          +'<div class="k">行政村名</div><div class="v">'+esc(p.village)+'</div>'
+          +'<div class="k">姓名 / 性别</div><div class="v">'+esc(p.name)+' / '+esc(p.gender)+'</div>'
+          +'<div class="k">身份证号</div><div class="v pw">'+esc(p.idCard||'—')+'</div>'
+          +'<div class="k">家庭住址</div><div class="v">'+esc(p.address||'—')+'</div>'
+          +'<div class="k">联系方式</div><div class="v pw">'+esc(p.phone||'—')+'</div>'
+          +'<div class="k">人员类别</div><div class="v">'+esc(p.category)+'</div>'
+          +'<div class="k">政治面貌</div><div class="v">'+esc(p.political)+'</div>'
+        +'</div>'
+        +photo
+      +'</div>'
+      +'<div class="sect">军旅信息</div>'
+      +'<div class="kv">'
+        +'<div class="k">入伍时间</div><div class="v">'+esc(p.enlistDate||'—')+'</div>'
+        +'<div class="k">退伍时间</div><div class="v">'+esc(p.dischargeDate||'—')+'</div>'
+        +'<div class="k">是否兵支书</div><div class="v">'+esc(p.isSecretary)+'</div>'
+        +'<div class="k">立功信息</div><div class="v">'+esc(p.merit||'—')+'</div>'
+        +'<div class="k">风险防控等级</div><div class="v">'+riskBadge(p.riskLevel)+'</div>'
+      +'</div>'
+      +'<div class="sect">家庭成员信息</div>'+fam
+      +'<div class="sect">常态化联系信息</div>'+cts
+      +'<div class="sect">帮扶记录</div>'+aids
+      +'<div class="sect">备注</div>'
+      +'<div class="tiny">'+esc(p.remark||'—')+'</div>'
+      +(p.status===0?'<div class="mt12 tiny" style="color:#d92d20">该记录已软删除（留痕）。删除备注：'+esc(p.delReason||'—')+'　时间：'+esc(p.delAt||'—')+'</div>':'')
+    +'</div>'
+    +'<div class="mf">'
+      +'<button class="btn" data-close="1">关闭</button>'
+      +(p.status===1?'<button class="btn warn" id="dt-warn">一键预警</button><button class="btn pri" id="dt-edit">编辑</button>':'')
+    +'</div>',true);
+  if($('dt-warn'))$('dt-warn').onclick=function(){closeModal();openWarn(id)};
+  if($('dt-edit'))$('dt-edit').onclick=function(){
+    closeModal();
+    S.editId=id;S.formFrom=(S.view==='all'?'all':'village');S.view='form';
+    render();window.scrollTo(0,0);
+  };
+}
+
+/* ---------------- 需求 6：附件照片点击放大预览 ---------------- */
+function openZoom(src){
+  if(!src)return;
+  openModal('<div class="mh"><b>照片预览</b><div class="spacer"></div><button class="x" data-close="1">✕</button></div>'
+    +'<div class="mb" style="text-align:center">'
+      +'<img src="'+src+'" style="max-width:100%;max-height:68vh;border-radius:9px;display:block;margin:0 auto">'
+      +'<div class="tiny muted3 mt12">点击空白处或右上角 ✕ 关闭</div>'
+    +'</div>',true);
+}
+
+/* ---------------- 删除（软删除 + 二次确认 + 备注） ---------------- */
+function openDelete(id){
+  var p=findP(id);if(!p)return;
+  openModal('<div class="mh"><b>删除确认</b><div class="spacer"></div><button class="x" data-close="1">✕</button></div>'
+    +'<div class="mb">'
+      +'<div style="background:#fdecea;border:1px solid #f3c3bd;border-radius:9px;padding:12px 14px;font-size:13px;color:#a32017">'
+        +'即将删除 <b>'+esc(p.village)+' · '+esc(p.name)+'</b> 的人员档案。'
+        +'<br>删除为<b>软删除</b>：数据不会物理清除，系统保留留痕，可随时恢复。</div>'
+      +'<div class="mt16"><label class="fl">删除备注<span class="req">*</span></label>'
+        +'<textarea class="inp" id="dl-note" rows="3" placeholder="请填写删除原因/备注（必填）"></textarea></div>'
+      +'<div class="mt12 tiny muted3">状态值说明：1 = 正常（列表展示），0 = 已删除（列表隐藏，仅“查看已删除”可见）。</div>'
+    +'</div>'
+    +'<div class="mf"><button class="btn" data-close="1">取消</button>'
+      +'<button class="btn danger" id="dl-ok">确认删除</button></div>');
+  $('dl-ok').onclick=function(){
+    var note=$('dl-note').value.trim();
+    if(!note){toast('请填写删除备注','err');return}
+    p.status=0;p.delReason=note;p.delAt=nowStr();p.updatedAt=nowStr();
+    saveDB();closeModal();render();
+    toast('已删除（软删除，数据已留痕）','ok');
+  };
+}
+function doBatchDelete(){
+  var v=S.village;
+  var list=DB.persons.filter(function(p){return p.village===v&&p.status===1});
+  if(!list.length){toast('当前村暂无数据','err');return}
+  openModal('<div class="mh"><b>批量删除</b><div class="spacer"></div><button class="x" data-close="1">✕</button></div>'
+    +'<div class="mb">'
+      +'<div class="tiny muted">勾选需要删除的人员（共 '+list.length+' 条可选），删除同样为软删除并留痕。</div>'
+      +'<div class="acc-list mt12" style="max-height:320px">'
+        +list.map(function(p){
+          return '<label class="acc-row"><input type="checkbox" data-bd="'+p.id+'">'
+            +'<span class="nm">'+esc(p.name)+'</span>'
+            +'<span class="vg">'+esc(p.category)+'</span>'
+            +'<span class="ph">'+esc(p.phone)+'</span></label>';
+        }).join('')
+      +'</div>'
+      +'<div class="mt16"><label class="fl">删除备注<span class="req">*</span></label>'
+        +'<textarea class="inp" id="bd-note" rows="2" placeholder="批量删除原因/备注（必填）"></textarea></div>'
+    +'</div>'
+    +'<div class="mf"><button class="btn" data-close="1">取消</button><button class="btn danger" id="bd-ok">确认删除所选</button></div>');
+  $('bd-ok').onclick=function(){
+    var note=$('bd-note').value.trim();
+    if(!note){toast('请填写删除备注','err');return}
+    var ids=[];
+    Array.prototype.forEach.call(document.querySelectorAll('[data-bd]'),function(cb){
+      if(cb.checked)ids.push(cb.getAttribute('data-bd'));
+    });
+    if(!ids.length){toast('请至少勾选一条','err');return}
+    ids.forEach(function(id){var p=findP(id);if(p){p.status=0;p.delReason=note;p.delAt=nowStr();p.updatedAt=nowStr()}});
+    saveDB();closeModal();render();
+    toast('已删除 '+ids.length+' 条（软删除留痕）','ok');
+  };
+}
+
+/* ---------------- 一键预警（短信模拟发送） ---------------- */
+function openWarn(id){
+  var p=findP(id);if(!p)return;
+  var towner=townAccounts()[0];      /* 首位乡级账号（乡镇书记）为默认接收人 */
+  var townPhone=towner.p;
+  var famPhones=(p.family||[]).map(function(f){return (f.name||'')+'('+(f.relation||'')+')'+(f.phone||'')}).join('、')||'无';
+  function build(note){
+    return '【向阳堡乡退役军人服务站】预警提醒：'+p.village+' '+p.name
+      +'，联系方式 '+p.phone+'，家庭成员联系方式：'+famPhones
+      +'，风险防控等级 '+p.riskLevel+' 级。备注：'+(note||'（未填写）')
+      +'。请及时关注处理。';
+  }
+  openModal('<div class="mh"><b>一键预警</b><div class="spacer"></div><button class="x" data-close="1">✕</button></div>'
+    +'<div class="mb">'
+      +'<div class="kv" style="grid-template-columns:96px 1fr">'
+        +'<div class="k">姓名</div><div class="v">'+esc(p.name)+'</div>'
+        +'<div class="k">行政村名</div><div class="v">'+esc(p.village)+'</div>'
+        +'<div class="k">联系方式</div><div class="v pw">'+esc(p.phone)+'</div>'
+        +'<div class="k">家庭成员联系方式</div><div class="v tiny">'+esc(famPhones)+'</div>'
+        +'<div class="k">发送至</div><div class="v">乡级账号 '+esc(towner.n)+' <span class="pw">'+esc(townPhone)+'</span></div>'
+      +'</div>'
+      +'<div class="mt16"><label class="fl">备注内容<span class="req">*</span></label>'
+        +'<textarea class="inp" id="wn-note" rows="3" placeholder="请填写预警备注内容，将与人员基本信息一并拼成短信发送"></textarea></div>'
+      +'<div class="mt16"><label class="fl">短信预览</label>'
+        +'<div class="notebox" id="wn-prev" style="background:#f4f8fe;border-color:#cfe0f8;color:#123f86">'+esc(build(''))+'</div></div>'
+      +'<div class="tiny muted3 mt12">说明：当前为模拟发送（演示环境不真实下发短信），已预留短信接口调用位置。</div>'
+    +'</div>'
+    +'<div class="mf"><button class="btn" data-close="1">取消</button><button class="btn pri" id="wn-send">发送短信</button></div>');
+  var note=$('wn-note');
+  note.oninput=function(){$('wn-prev').textContent=build(note.value.trim())};
+  $('wn-send').onclick=function(){
+    var n=note.value.trim();
+    if(!n){toast('请填写预警备注内容','err');return}
+    var content=build(n);
+    /* === 短信接口预留位 ===
+       fetch('/api/sms/send',{method:'POST',headers:{'Content-Type':'application/json'},
+         body:JSON.stringify({to:townPhone,content:content})})
+       生产环境替换为真实短信服务商接口即可。 */
+    DB.warnings.push({id:'W'+uid(),personId:p.id,name:p.name,village:p.village,
+      phone:p.phone,to:townPhone,content:content,note:n,at:nowStr(),
+      handled:false,handleNote:'',handleAt:'',by:S.user.name});
+    saveDB();closeModal();
+    toast('预警短信已发送至 '+towner.n+'（模拟）','ok');
+  };
+}
+
+/* ---------------- 导出 / 导入 / 模板 ---------------- */
+function currentList(){
+  var v=S.village,f=S.filters||blankFilters();
+  return DB.persons.filter(function(p){
+    if(p.village!==v)return false;
+    if(S.showDeleted){if(p.status!==0)return false}else{if(p.status!==1)return false}
+    if(f.kw&&!(p.name.indexOf(f.kw)>=0||p.phone.indexOf(f.kw)>=0||p.idCard.indexOf(f.kw)>=0||p.address.indexOf(f.kw)>=0))return false;
+    if(f.category&&p.category!==f.category)return false;
+    if(f.risk&&String(p.riskLevel)!==String(f.risk))return false;
+    if(f.secretary&&p.isSecretary!==f.secretary)return false;
+    if(f.political&&p.political!==f.political)return false;
+    return true;
+  });
+}
+function rowOf(p){
+  return [p.village,p.name,p.gender,p.idCard,p.address,p.phone,p.category,p.political,
+    p.enlistDate||'',p.dischargeDate||'',p.isSecretary,p.merit||'',p.riskLevel+'级',
+    (p.family||[]).map(function(f){return (f.name||'')+'('+(f.relation||'')+','+(f.phone||'')+','+(f.address||'')+')'}).join('；'),
+    (p.contacts||[]).map(function(c){return (c.date||'')+' '+c.method+' '+(c.fixedIncome||'')+' '+(c.situation||'')}).join('；'),
+    p.remark||''];
+}
+function downloadBlob(blob,name){
+  var url=URL.createObjectURL(blob),a=document.createElement('a');
+  a.href=url;a.download=name;document.body.appendChild(a);a.click();
+  setTimeout(function(){URL.revokeObjectURL(url);a.remove()},300);
+}
+function toCSV(rows){
+  return '\ufeff'+rows.map(function(r){
+    return r.map(function(c){var s=String(c==null?'':c);return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s}).join(',')
+  }).join('\r\n');
+}
+function doExport(){
+  var list=currentList();
+  if(!list.length){toast('当前无可导出数据','err');return}
+  var rows=[IMPORT_HEADERS].concat(list.map(rowOf));
+  var fname=S.village+'_退役军人信息_'+today();
+  if(window.XLSX){
+    var ws=XLSX.utils.aoa_to_sheet(rows);
+    ws['!cols']=[{wch:12},{wch:10},{wch:6},{wch:20},{wch:22},{wch:14},{wch:16},{wch:12},{wch:12},{wch:12},{wch:9},{wch:14},{wch:12},{wch:36},{wch:44},{wch:18}];
+    var wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'人员信息');
+    XLSX.writeFile(wb,fname+'.xlsx');
+    toast('已导出 '+list.length+' 条（Excel）','ok');
+  }else{
+    downloadBlob(new Blob([toCSV(rows)],{type:'text/csv;charset=utf-8'}),fname+'.csv');
+    toast('未加载 Excel 组件，已导出 CSV','ok');
+  }
+}
+function doTemplate(){
+  var rows=[IMPORT_HEADERS,
+    ['向阳堡村','张建军','男','140603197803124517','向阳堡村3组18号','13800138000','退役士兵','中共党员','1998-12-01','2003-12-01','否','三等功','3级','李秀英(配偶,13900139000)；张伟(子,13700137000)','2026-03-12 电话 是 已联系，情况稳定','示例行，导入前请删除'],
+    ['小庄村','王海林','男','140603198511204536','小庄村2组9号','13900139001','参战参试人员','群众','2005-12-01','2010-12-01','否','','2级','刘桂兰(配偶,13600136000)','2026-04-08 实地走访 否 已上门了解情况','']
+  ];
+  if(window.XLSX){
+    var ws=XLSX.utils.aoa_to_sheet(rows);
+    ws['!cols']=IMPORT_HEADERS.map(function(){return {wch:18}});
+    var wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'导入模板');
+    XLSX.writeFile(wb,'向阳堡乡退役军人信息_导入模板.xlsx');
+    toast('导入模板已下载','ok');
+  }else{
+    downloadBlob(new Blob([toCSV(rows)],{type:'text/csv;charset=utf-8'}),'向阳堡乡退役军人信息_导入模板.csv');
+    toast('已下载 CSV 模板','ok');
+  }
+}
+function parseFam(s){
+  if(!s)return [];
+  return String(s).split(/[；;]/).filter(Boolean).map(function(x){
+    /* 兼容两种写法：姓名(关系,电话) 与 姓名(关系,电话,住址) */
+    var m=x.match(/^([^(（]*)[(（]([^)）]*)[)）]?/);
+    if(m){
+      var parts=String(m[2]||'').split(/[,，]/);
+      return {name:m[1],relation:parts[0]||'其他',phone:parts[1]||'',address:parts[2]||'',remark:''};
+    }
+    return {name:x,relation:'其他',phone:'',address:'',remark:''};
+  });
+}
+function parseCt(s){
+  if(!s)return [];
+  return String(s).split(/[；;]/).filter(Boolean).map(function(x){
+    var t=x.trim().split(/\s+/);
+    return {date:t[0]||'',method:(t[1]&&METHODS.indexOf(t[1])>=0)?t[1]:'电话',
+      fixedIncome:(t[2]==='否'?'否':'是'),situation:t.slice(3).join(' ')||x.trim(),photos:[]};
+  });
+}
+function doImport(){
+  var inp=document.createElement('input');
+  inp.type='file';inp.accept='.xlsx,.xls,.csv';
+  inp.onchange=function(){
+    var f=inp.files&&inp.files[0];if(!f)return;
+    var isCSV=/\.csv$/i.test(f.name);
+    if(window.XLSX&&!isCSV){
+      var r=new FileReader();
+      r.onload=function(e){
+        try{
+          var wb=XLSX.read(new Uint8Array(e.target.result),{type:'array'});
+          var ws=wb.Sheets[wb.SheetNames[0]];
+          var aoa=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
+          importRows(aoa);
+        }catch(err){toast('文件解析失败：'+err.message,'err')}
+      };
+      r.readAsArrayBuffer(f);
+    }else{
+      var r2=new FileReader();
+      r2.onload=function(e){
+        var txt=String(e.target.result).replace(/^\ufeff/,'');
+        var aoa=txt.split(/\r?\n/).filter(function(l){return l.trim()!==''}).map(function(l){
+          return l.split(',').map(function(c){return c.replace(/^"|"$/g,'').replace(/""/g,'"')});
+        });
+        importRows(aoa);
+      };
+      r2.readAsText(f,'utf-8');
+    }
+  };
+  inp.click();
+}
+function importRows(aoa){
+  if(!aoa||aoa.length<2){toast('文件内容为空','err');return}
+  var head=aoa[0].map(function(h){return String(h).trim()});
+  var idx={};IMPORT_HEADERS.forEach(function(h){idx[h]=head.indexOf(h)});
+  if(idx['姓名']<0||idx['行政村名']<0){toast('未识别到「姓名」「行政村名」列，请使用下载的模板','err');return}
+  var ok=0,skip=0,rows=[];
+  for(var i=1;i<aoa.length;i++){
+    var r=aoa[i];if(!r||!String(r[idx['姓名']]||'').trim())continue;
+    var v=String(r[idx['行政村名']]||'').trim();
+    if(!v||VILLAGES.indexOf(v)<0){skip++;continue}
+    if(!canAccess(v)){skip++;continue}
+    /* 风险等级非必填（需求 8）：空 / 非法值一律记为 0 = 未评定 */
+    var risk=parseInt(String(r[idx['风险防控等级']]||'').replace(/[^\d]/g,''),10);
+    if(!(risk>=1&&risk<=3))risk=0;
+    var np=newPerson(v);
+    np.id='P'+uid();
+    np.name=String(r[idx['姓名']]).trim();
+    np.gender=String(r[idx['性别']]||'男').trim()||'男';
+    np.idCard=String(r[idx['身份证号']]||'').trim();
+    np.address=String(r[idx['家庭住址']]||'').trim();
+    np.phone=String(r[idx['联系方式']]||'').trim();
+    np.category=CAT_NAMES.indexOf(String(r[idx['人员类别']]||'').trim())>=0?String(r[idx['人员类别']]).trim():'退役士兵';
+    np.political=POLITICAL.indexOf(String(r[idx['政治面貌']]||'').trim())>=0?String(r[idx['政治面貌']]).trim():'群众';
+    np.enlistDate=String(r[idx['入伍时间']]||'').trim();
+    np.dischargeDate=String(r[idx['退伍时间']]||'').trim();
+    np.isSecretary=String(r[idx['是否兵支书']]||'否').trim()==='是'?'是':'否';
+    np.merit=String(r[idx['立功信息']]||'').trim();
+    np.riskLevel=risk;
+    np.family=parseFam(r[idx['家庭成员信息']]);
+    np.contacts=parseCt(r[idx['常态化联系信息']]);
+    np.remark=String(r[idx['备注']]||'').trim();
+    np.status=1;np.delReason='';np.delAt='';
+    np.createdAt=today();np.updatedAt='';
+    rows.push(np);
+    ok++;
+  }
+  if(!ok){toast('没有可导入的有效数据（共跳过 '+skip+' 行）','err');return}
+  openModal('<div class="mh"><b>导入确认</b><div class="spacer"></div><button class="x" data-close="1">✕</button></div>'
+    +'<div class="mb"><div>已解析到 <b>'+ok+'</b> 条有效数据'+(skip?'，跳过 '+skip+' 行（村名无效或无权限）':'')+'。</div>'
+      +'<div class="tiny muted3 mt12">数据将追加到对应行政村，重复人员不会自动去重，请确认后再导入。</div></div>'
+    +'<div class="mf"><button class="btn" data-close="1">取消</button><button class="btn pri" id="im-ok">确认导入</button></div>');
+  $('im-ok').onclick=function(){
+    DB.persons=DB.persons.concat(rows);saveDB();closeModal();render();
+    toast('成功导入 '+rows.length+' 条','ok');
+  };
+}
+
+/* ---------------- 通用：软删除二次确认（带必填原因） ---------------- */
+function confirmSoftDelete(title,descHtml,onOk){
+  openModal('<div class="mh"><b>'+esc(title)+'</b><div class="spacer"></div><button class="x" data-close="1">✕</button></div>'
+    +'<div class="mb"><div style="background:#fdecea;border:1px solid #f3c3bd;border-radius:9px;padding:12px 14px;font-size:13px;color:#a32017">'
+      +descHtml+'</div>'
+      +'<div class="mt16"><label class="fl">删除原因<span class="req">*</span></label>'
+      +'<input class="inp" id="sd-note" placeholder="请填写删除原因（必填）"></div>'
+      +'<div class="tiny muted3 mt12">本系统统一采用软删除：记录保留留痕，可在「查看已删除」中恢复。</div></div>'
+    +'<div class="mf"><button class="btn" data-close="1">取消</button><button class="btn danger" id="sd-ok">确认删除</button></div>');
+  $('sd-ok').onclick=function(){
+    var n=$('sd-note').value.trim();
+    if(!n){toast('请填写删除原因','err');return}
+    onOk(n);
+  };
+}
+
+/* ---------------- 视图：来访诉求 ---------------- */
+function visitsOf(){
+  if(!S.user)return [];
+  if(S.user.lv==='town')return DB.visits.slice();
+  return DB.visits.filter(function(x){return x.village===S.user.v});
+}
+function blankVisitFilter(){return {kw:'',handle:'',village:''}}
+function viewVisit(){
+  if(!S.visitFilter)S.visitFilter=blankVisitFilter();
+  var f=S.visitFilter;
+  var isTown=(S.user.lv==='town');
+  var list=visitsOf().filter(function(x){
+    if(S.showDeleted){if(x.status!==0)return false}else{if(x.status!==1)return false}
+    if(f.kw){
+      var kw=f.kw;
+      if(!((x.name||'').indexOf(kw)>=0||(x.phone||'').indexOf(kw)>=0
+        ||(x.address||'').indexOf(kw)>=0||(x.appeal||'').indexOf(kw)>=0))return false;
+    }
+    if(f.handle&&x.handle!==f.handle)return false;
+    if(f.village&&x.village!==f.village)return false;
+    return true;
+  }).sort(function(a,b){
+    var da=a.date||'',db=b.date||'';
+    if(da!==db)return da<db?1:-1;                 /* 来访时间倒序：最近的排最前 */
+    return (b.createdAt||'')<(a.createdAt||'')?-1:1;
+  });
+  var done=0,doing=0,none=0;
+  list.forEach(function(x){
+    if(x.handle==='已办结')done++;else if(x.handle==='处理中')doing++;else none++;
+  });
+  /* 来访人员次数统计：姓名 + 手机号相同视为同一人 */
+  var map={},order=[];
+  list.forEach(function(x){
+    var k=(x.name||'')+'|'+(x.phone||'');
+    if(!map[k]){map[k]={name:x.name,phone:x.phone,n:0,last:''};order.push(k)}
+    map[k].n++;
+    if((x.date||'')>map[k].last)map[k].last=x.date||'';
+  });
+  var rank=order.map(function(k){return map[k]}).sort(function(a,b){return b.n-a.n});
+  var maxN=1;rank.forEach(function(r){if(r.n>maxN)maxN=r.n});
+  var rankHtml=rank.slice(0,12).map(function(r){
+    var w=Math.round(r.n/maxN*100);if(w<4)w=4;
+    return '<div class="vs"><span class="n">'+esc(r.name||'—')
+      +(r.phone?'<span class="muted3"> '+esc(maskPhone(r.phone))+'</span>':'')+'</span>'
+      +'<span class="t"><i style="width:'+w+'%"></i></span><span class="c">'+r.n+' 次</span></div>';
+  }).join('')||'<div class="tiny muted3">暂无来访记录</div>';
+
+  var pageSize=20,total=list.length,pages=Math.max(1,Math.ceil(total/pageSize));
+  if(S.page>pages)S.page=pages;if(S.page<1)S.page=1;
+  var start=(S.page-1)*pageSize;
+  var rows=list.slice(start,start+pageSize);
+  var trs=rows.map(function(x,i){
+    return '<tr>'
+      +'<td>'+(start+i+1)+'</td>'
+      +(isTown?'<td>'+esc(x.village||'—')+'</td>':'')
+      +'<td>'+esc(x.date||'—')+'</td>'
+      +'<td><b>'+esc(x.name||'—')+'</b></td>'
+      +'<td>'+esc(x.gender||'—')+'</td>'
+      +'<td>'+esc(x.nation||'—')+'</td>'
+      +'<td>'+esc(x.address||'—')+'</td>'
+      +'<td class="pw">'+esc(x.phone||'—')+'</td>'
+      +'<td>'+esc(x.dischargeDate||'—')+'</td>'
+      +'<td>'+esc(x.receiver||'—')+'</td>'
+      +'<td class="muted" style="max-width:280px;white-space:normal">'+esc(x.appeal||'—')+'</td>'
+      +'<td><span class="badge '+visitCls(x.handle)+'">'+esc(x.handle)+'</span></td>'
+      +'<td class="muted3">'+esc(x.remark||'—')+'</td>'
+      +'<td><div class="ops">'
+        +(x.status===0
+          ? '<button class="btn sm" data-vrestore="'+x.id+'">恢复</button>'
+          : '<button class="btn sm" data-vview="'+x.id+'">查看</button>'
+            +'<button class="btn sm" data-vedit="'+x.id+'">编辑</button>'
+            +'<button class="btn sm danger" data-vdel="'+x.id+'">删除</button>')
+      +'</div></td>'
+    +'</tr>';
+  }).join('');
+  var cols=isTown?14:13;
+  var vOpts=isTown?('<option value="">全部村</option>'+VILLAGES.map(function(v){
+    return '<option value="'+esc(v)+'"'+(f.village===v?' selected':'')+'>'+esc(v)+'</option>'}).join('')):'';
+
+  return topbar('来访诉求'+(S.showDeleted?'（已删除数据）':''))
+    +'<div class="wrap" style="padding-bottom:28px">'
+      +'<div class="stats mt16">'
+        +statCard('来访总次数','d-blue',total,'次')
+        +statCard('已办结','d-green',done,'次')
+        +statCard('处理中','d-amber',doing,'次')
+        +statCard('未进行','d-gray',none,'次')
+      +'</div>'
+      +'<div class="panels mt16">'
+        +'<div class="panel"><h3>来访人员次数统计<span class="more">按次数排序，最多显示 12 人</span></h3>'
+          +'<div class="vstat">'+rankHtml+'</div></div>'
+        +'<div class="panel"><h3>办理情况分布</h3>'
+          +'<div class="donut-wrap">'
+            +donut([{n:'已办结',v:done,c:'#0f9d58'},{n:'处理中',v:doing,c:'#c98a00'},{n:'未进行',v:none,c:'#9aa4b2'}],168)
+            +legendOf([{n:'已办结',v:done,c:'#0f9d58'},{n:'处理中',v:doing,c:'#c98a00'},{n:'未进行',v:none,c:'#9aa4b2'}])
+          +'</div></div>'
+      +'</div>'
+      +'<div class="row mt16">'
+        +'<button class="btn pri" id="vi-add">＋ 新增来访记录</button>'
+        +'<button class="btn" id="vi-query">查询</button>'
+        +'<div class="spacer"></div>'
+        +'<button class="btn ghost" id="vi-deleted">'+(S.showDeleted?'← 返回正常列表':'查看已删除')+'</button>'
+      +'</div>'
+      +'<div class="card mt12 hide" id="vi-filter"><div class="mb" style="padding:14px">'
+        +'<div class="filters">'
+          +'<div><label class="fl">关键字</label><input class="inp" id="if-kw" placeholder="姓名 / 电话 / 住址 / 诉求" value="'+esc(f.kw)+'"></div>'
+          +(isTown?'<div><label class="fl">行政村</label><select class="inp" id="if-village">'+vOpts+'</select></div>':'')
+          +'<div><label class="fl">办理情况</label><select class="inp" id="if-status">'
+            +'<option value="">全部</option>'+VISIT_STATUS.map(function(s){
+              return '<option value="'+esc(s)+'"'+(f.handle===s?' selected':'')+'>'+esc(s)+'</option>'}).join('')
+          +'</select></div>'
+        +'</div>'
+        +'<div class="row mt12"><button class="btn pri" id="if-ok">查询</button>'
+          +'<button class="btn" id="if-reset">重置</button>'
+          +'<div class="spacer"></div><span class="tiny muted3">共匹配 '+total+' 条</span></div>'
+      +'</div></div>'
+      +'<div class="card mt12" style="padding:12px 14px"><div class="row">'
+        +'<div class="tiny muted">共 <b style="color:#1e2430">'+total+'</b> 条来访记录'
+          +(S.showDeleted?'（已删除数据）':'')+'　<span class="tiny muted3">按来访时间倒序</span></div>'
+        +'<div class="spacer"></div><span class="tiny muted3">'
+          +(S.showDeleted?'软删除留痕，可恢复':'删除为软删除，数据保留留痕')+'</span>'
+      +'</div></div>'
+      +'<div class="tbl-wrap mt12"><table class="tbl" style="min-width:1560px"><thead><tr>'
+        +'<th style="width:44px">序号</th>'+(isTown?'<th>行政村</th>':'')
+        +'<th>来访时间</th><th>姓名</th><th>性别</th><th>民族</th><th>家庭住址</th><th>联系方式</th>'
+        +'<th>退伍时间</th><th>接待人</th><th>主要诉求</th><th>办理情况</th><th>备注</th><th style="width:170px">操作</th>'
+      +'</tr></thead><tbody>'+(trs||'<tr><td colspan="'+cols+'"><div class="empty">暂无来访诉求记录<br><span style="font-size:12px">点击上方「＋ 新增来访记录」录入第一条</span></div></td></tr>')+'</tbody></table></div>'
+      +'<div class="pager">'
+        +'<span>共 '+total+' 条，第 '+S.page+'/'+pages+' 页</span>'
+        +'<button class="pg" data-pg="1">首页</button>'
+        +'<button class="pg" data-pg="'+(S.page-1)+'">上一页</button>'
+        +'<button class="pg" data-pg="'+(S.page+1)+'">下一页</button>'
+        +'<button class="pg" data-pg="'+pages+'">末页</button>'
+      +'</div>'
+      +noteBox('visit','来访诉求页面备注','例如：接待安排、值班交接说明')
+    +'</div>';
+}
+function openVisitForm(id){
+  var isEdit=!!id;
+  var x=isEdit?findVisit(id):newVisit(S.village||(S.user.lv==='vil'?S.user.v:''));
+  if(!x)return;
+  var vOpts=(S.user.lv==='town'?VILLAGES:[S.user.v]).map(function(v){
+    return '<option value="'+esc(v)+'"'+(x.village===v?' selected':'')+'>'+esc(v)+'</option>'}).join('');
+  openModal('<div class="mh"><b>'+(isEdit?'编辑来访记录':'新增来访记录')+'</b><div class="spacer"></div><button class="x" data-close="1">✕</button></div>'
+    +'<div class="mb"><div class="formgrid">'
+      +'<div><label class="fl">行政村<span class="req">*</span></label><select class="inp" id="vf-village">'+vOpts+'</select></div>'
+      +'<div><label class="fl">来访时间<span class="req">*</span></label><input class="inp" type="date" id="vf-date" value="'+esc(x.date||today())+'"></div>'
+      +'<div><label class="fl">人员姓名<span class="req">*</span></label><input class="inp" id="vf-name" value="'+esc(x.name||'')+'" placeholder="请输入来访人姓名"></div>'
+      +'<div><label class="fl">性别</label><select class="inp" id="vf-gender">'
+        +['男','女'].map(function(g){return '<option value="'+g+'"'+(x.gender===g?' selected':'')+'>'+g+'</option>'}).join('')
+      +'</select></div>'
+      +'<div><label class="fl">民族</label><input class="inp" id="vf-nation" value="'+esc(x.nation||'汉族')+'"></div>'
+      +'<div><label class="fl">联系方式</label><input class="inp" id="vf-phone" value="'+esc(x.phone||'')+'" placeholder="11 位手机号"></div>'
+      +'<div class="full"><label class="fl">家庭住址</label><input class="inp" id="vf-addr" value="'+esc(x.address||'')+'" placeholder="如：向阳堡村3组18号"></div>'
+      +'<div><label class="fl">退伍时间</label><input class="inp" type="date" id="vf-discharge" value="'+esc(x.dischargeDate||'')+'"></div>'
+      +'<div><label class="fl">接待人</label><input class="inp" id="vf-receiver" value="'+esc(x.receiver||'')+'" placeholder="如：程晓青"></div>'
+      +'<div><label class="fl">办理情况<span class="req">*</span></label><select class="inp" id="vf-handle">'
+        +VISIT_STATUS.map(function(s){return '<option value="'+esc(s)+'"'+(x.handle===s?' selected':'')+'>'+esc(s)+'</option>'}).join('')
+      +'</select></div>'
+      +'<div class="full"><label class="fl">主要诉求<span class="req">*</span></label>'
+        +'<textarea class="inp" rows="3" id="vf-appeal" placeholder="记录来访人反映的主要问题与诉求">'+esc(x.appeal||'')+'</textarea></div>'
+      +'<div class="full"><label class="fl">备注</label><input class="inp" id="vf-remark" value="'+esc(x.remark||'')+'"></div>'
+    +'</div></div>'
+    +'<div class="mf"><button class="btn" data-close="1">取消</button><button class="btn pri" id="vf-save">保存</button></div>',true);
+  $('vf-save').onclick=function(){
+    var village=$('vf-village').value,name=$('vf-name').value.trim();
+    var date=$('vf-date').value,appeal=$('vf-appeal').value.trim();
+    var phone=$('vf-phone').value.trim();
+    if(!name){toast('请填写人员姓名','err');return}
+    if(!date){toast('请选择来访时间','err');return}
+    if(phone&&!/^\d{11}$/.test(phone)){toast('联系方式须为 11 位手机号','err');return}
+    if(!appeal){toast('请填写主要诉求','err');return}
+    if(!canAccess(village)){toast('无权在该行政村录入','err');return}
+    var obj={
+      village:village, date:date, name:name, gender:$('vf-gender').value,
+      nation:$('vf-nation').value.trim(), address:$('vf-addr').value.trim(), phone:phone,
+      dischargeDate:$('vf-discharge').value, receiver:$('vf-receiver').value.trim(),
+      appeal:appeal, handle:$('vf-handle').value, remark:$('vf-remark').value.trim()
+    };
+    if(isEdit){
+      var t=findVisit(id);if(!t){toast('记录不存在','err');return}
+      Object.keys(obj).forEach(function(k){t[k]=obj[k]});
+      t.updatedAt=nowStr();
+    }else{
+      var nv=newVisit(village);
+      Object.keys(obj).forEach(function(k){nv[k]=obj[k]});
+      DB.visits.push(nv);
+    }
+    saveDB();closeModal();render();
+    toast(isEdit?'已保存修改':'已新增来访记录','ok');
+  };
+}
+function openVisitDetail(id){
+  var x=findVisit(id);if(!x)return;
+  openModal('<div class="mh"><b>'+esc(x.name||'—')+' · 来访诉求详情</b>'
+      +'<span class="badge '+visitCls(x.handle)+'">'+esc(x.handle)+'</span>'
+      +'<div class="spacer"></div><button class="x" data-close="1">✕</button></div>'
+    +'<div class="mb"><div class="kv">'
+      +'<div class="k">行政村名</div><div class="v">'+esc(x.village||'—')+'</div>'
+      +'<div class="k">来访时间</div><div class="v">'+esc(x.date||'—')+'</div>'
+      +'<div class="k">姓名 / 性别</div><div class="v">'+esc(x.name||'—')+' / '+esc(x.gender||'—')+'</div>'
+      +'<div class="k">民族</div><div class="v">'+esc(x.nation||'—')+'</div>'
+      +'<div class="k">家庭住址</div><div class="v">'+esc(x.address||'—')+'</div>'
+      +'<div class="k">联系方式</div><div class="v pw">'+esc(x.phone||'—')+'</div>'
+      +'<div class="k">退伍时间</div><div class="v">'+esc(x.dischargeDate||'—')+'</div>'
+      +'<div class="k">接待人</div><div class="v">'+esc(x.receiver||'—')+'</div>'
+      +'<div class="k">办理情况</div><div class="v">'+esc(x.handle||'—')+'</div>'
+    +'</div>'
+    +'<div class="sect">主要诉求</div><div class="tiny" style="line-height:1.9">'+esc(x.appeal||'—')+'</div>'
+    +'<div class="sect">备注</div><div class="tiny">'+esc(x.remark||'—')+'</div>'
+    +'<div class="tiny muted3 mt12">登记人：'+esc(x.createdAt||'—')
+      +(x.updatedAt?'　最后修改：'+esc(x.updatedAt):'')+'</div>'
+    +(x.status===0?'<div class="mt12 tiny" style="color:#d92d20">该记录已软删除（留痕）。删除备注：'+esc(x.delReason||'—')+'　时间：'+esc(x.delAt||'—')+'</div>':'')
+    +'</div>'
+    +'<div class="mf"><button class="btn" data-close="1">关闭</button>'
+      +(x.status===1?'<button class="btn pri" id="vd-edit">编辑</button>':'')+'</div>');
+  if($('vd-edit'))$('vd-edit').onclick=function(){closeModal();openVisitForm(id)};
+}
+function bindVisit(){
+  bindTopbar();
+  bindPager();
+  $('vi-add').onclick=function(){openVisitForm(null)};
+  $('vi-query').onclick=function(){$('vi-filter').classList.toggle('hide')};
+  $('vi-deleted').onclick=function(){S.showDeleted=!S.showDeleted;S.page=1;render()};
+  var ok=$('if-ok');
+  if(ok)ok.onclick=function(){
+    S.visitFilter={kw:$('if-kw').value.trim(),handle:$('if-status').value,
+      village:($('if-village')?$('if-village').value:'')};
+    S.page=1;render();
+  };
+  var rs=$('if-reset');
+  if(rs)rs.onclick=function(){S.visitFilter=blankVisitFilter();S.page=1;render()};
+  var kw=$('if-kw');
+  if(kw)kw.onkeydown=function(e){if(e.key==='Enter'&&ok)ok.click()};
+  Array.prototype.forEach.call(document.querySelectorAll('[data-vview]'),function(b){
+    b.onclick=function(){openVisitDetail(b.getAttribute('data-vview'))};
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-vedit]'),function(b){
+    b.onclick=function(){openVisitForm(b.getAttribute('data-vedit'))};
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-vdel]'),function(b){
+    b.onclick=function(){
+      var id=b.getAttribute('data-vdel'),x=findVisit(id);if(!x)return;
+      confirmSoftDelete('删除来访记录',
+        '将删除 <b>'+esc(x.name||'—')+'</b> 于 '+esc(x.date||'—')+' 的来访记录。',
+        function(note){
+          x.status=0;x.delReason=note;x.delAt=nowStr();
+          saveDB();closeModal();render();
+          toast('已删除该条来访记录','ok');
+        });
+    };
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-vrestore]'),function(b){
+    b.onclick=function(){
+      var x=findVisit(b.getAttribute('data-vrestore'));if(!x)return;
+      x.status=1;x.updatedAt=nowStr();saveDB();render();
+      toast('已恢复该条来访记录','ok');
+    };
+  });
+  bindNotes();
+}
+
+/* ---------------- 视图：七包一 ---------------- */
+function baoyiOf(){
+  if(!S.user)return [];
+  if(S.user.lv==='town')return DB.baoyi.slice();
+  return DB.baoyi.filter(function(b){return b.village===S.user.v});
+}
+function viewBaoyi(){
+  if(!S.baoyiFilter)S.baoyiFilter={kw:''};
+  var f=S.baoyiFilter;
+  var list=baoyiOf().filter(function(b){
+    if(S.showDeleted){if(b.status!==0)return false}else{if(b.status!==1)return false}
+    if(f.kw){
+      var kw=f.kw;
+      var hay=[b.name,b.hukou,b.residence,b.village,b.category,b.unit,
+        b.district,b.town,b.villageLd,b.police,b.legal,b.remark].join(' ');
+      if(hay.indexOf(kw)<0)return false;
+    }
+    return true;
+  }).sort(function(a,b){return (a.createdAt||'')<(b.createdAt||'')?-1:1});
+  var total=list.length;
+  var pageSize=20,pages=Math.max(1,Math.ceil(total/pageSize));
+  if(S.page>pages)S.page=pages;if(S.page<1)S.page=1;
+  var start=(S.page-1)*pageSize;
+  var rows=list.slice(start,start+pageSize);
+  var trs=rows.map(function(b,i){
+    return '<tr>'
+      +'<td>'+(start+i+1)+'</td>'
+      +'<td>'+esc(b.unit||'—')+'</td>'
+      +'<td><b>'+esc(b.name||'—')+'</b></td>'
+      +'<td>'+esc(b.hukou||'—')+'</td>'
+      +'<td>'+esc(b.residence||'—')+'</td>'
+      +'<td>'+esc(b.category||'—')+'</td>'
+      +'<td>'+esc(b.district||'—')+'</td>'
+      +'<td>'+esc(b.town||'—')+'</td>'
+      +'<td>'+esc(b.villageLd||'—')+'</td>'
+      +'<td>'+esc(b.police||'—')+'</td>'
+      +'<td>'+esc(b.legal||'—')+'</td>'
+      +'<td><div class="ops">'
+        +(b.status===0
+          ? '<button class="btn sm" data-brestore="'+b.id+'">恢复</button>'
+          : '<button class="btn sm" data-bedit="'+b.id+'">编辑</button>'
+            +'<button class="btn sm danger" data-bdel="'+b.id+'">删除</button>')
+      +'</div></td>'
+    +'</tr>';
+  }).join('');
+  return topbar('七包一台账'+(S.showDeleted?'（已删除数据）':''))
+    +'<div class="wrap" style="padding-bottom:28px">'
+      +'<div class="stats mt16">'
+        +statCard('台账条数','d-blue',total,'条')
+        +statCard('已删除留痕','d-gray',baoyiOf().filter(function(b){return b.status===0}).length,'条')
+        +statCard('未填法律工作者','d-amber',list.filter(function(b){return !b.legal}).length,'条')
+      +'</div>'
+      +'<div class="row mt16">'
+        +'<button class="btn pri" id="by-add">＋ 添加</button>'
+        +'<button class="btn" id="by-query">查询</button>'
+        +'<div class="spacer"></div>'
+        +'<button class="btn ghost" id="by-deleted">'+(S.showDeleted?'← 返回正常列表':'查看已删除')+'</button>'
+      +'</div>'
+      +'<div class="card mt12 hide" id="by-filter"><div class="mb" style="padding:14px">'
+        +'<div class="filters"><div><label class="fl">关键字</label>'
+          +'<input class="inp" id="bf-kw" placeholder="姓名 / 户籍地 / 常住地 / 各级负责人" value="'+esc(f.kw)+'"></div></div>'
+        +'<div class="row mt12"><button class="btn pri" id="bf-ok">查询</button>'
+          +'<button class="btn" id="bf-reset">重置</button>'
+          +'<div class="spacer"></div><span class="tiny muted3">共匹配 '+total+' 条</span></div>'
+      +'</div></div>'
+      +'<div class="card mt12" style="padding:12px 16px">'
+        +'<div class="tiny muted" style="line-height:1.95">'
+          +'<b style="color:#1e2430">说明：</b>本台账对应《朔州市平鲁区涉军信访人员“七包一”台账》，'
+          +'即每名涉军信访人员由区级包案领导、乡级负责人、村级负责人、派出所负责人、法律工作者共同包联。'
+          +'点击「＋ 添加」可从系统建档中选择退伍军人自动带出信息，也可全部手工填写。'
+        +'</div>'
+      +'</div>'
+      +'<div class="tbl-wrap mt12"><table class="tbl" style="min-width:1500px"><thead><tr>'
+        +'<th style="width:44px">序号</th><th>责任单位</th><th>姓名</th><th>户籍地</th><th>常住地</th><th>人员类别</th>'
+        +'<th>区级包案领导</th><th>乡级负责人<br><span class="tiny muted3" style="font-weight:400">书记 / 副书记</span></th>'
+        +'<th>村级负责人<br><span class="tiny muted3" style="font-weight:400">支部书记、村主任 / 网格员</span></th>'
+        +'<th>派出所负责人</th><th>法律工作者</th><th style="width:130px">操作</th>'
+      +'</tr></thead><tbody>'+(trs||'<tr><td colspan="12"><div class="empty">暂无七包一台账记录<br><span style="font-size:12px">点击上方「＋ 添加」录入第一条</span></div></td></tr>')+'</tbody></table></div>'
+      +'<div class="pager">'
+        +'<span>共 '+total+' 条，第 '+S.page+'/'+pages+' 页</span>'
+        +'<button class="pg" data-pg="1">首页</button>'
+        +'<button class="pg" data-pg="'+(S.page-1)+'">上一页</button>'
+        +'<button class="pg" data-pg="'+(S.page+1)+'">下一页</button>'
+        +'<button class="pg" data-pg="'+pages+'">末页</button>'
+      +'</div>'
+      +noteBox('baoyi','七包一台账页面备注','例如：包联调整情况、台账核对时间')
+    +'</div>';
+}
+function openBaoyiForm(id){
+  var isEdit=!!id;
+  var b=isEdit?findBaoyi(id):newBaoyi(S.village||'');
+  if(!b)return;
+  var cand=DB.persons.filter(function(p){return p.status===1&&canAccess(p.village)});
+  var pOpts='<option value="">— 不关联，手工填写 —</option>'+cand.map(function(p){
+    return '<option value="'+p.id+'"'+(b.personId===p.id?' selected':'')+'>'
+      +esc(p.village)+' · '+esc(p.name)+'（'+esc(p.category)+'）</option>'}).join('');
+  var catOpts='<option value="">未填写</option>'+CAT_NAMES.map(function(c){
+    return '<option value="'+esc(c)+'"'+(b.category===c?' selected':'')+'>'+esc(c)+'</option>'}).join('');
+  openModal('<div class="mh"><b>'+(isEdit?'编辑七包一台账':'新增七包一台账')+'</b>'
+      +'<div class="spacer"></div><button class="x" data-close="1">✕</button></div>'
+    +'<div class="mb">'
+      +'<div class="tiny muted3" style="margin-bottom:12px">'
+        +'可从系统建档中选择退伍军人，自动带出姓名、户籍地、常住地与人员类别；也可全部手工填写。'
+      +'</div>'
+      +'<div class="formgrid">'
+        +'<div class="full"><label class="fl">从建档档案选择人员</label><select class="inp" id="by-pick">'+pOpts+'</select></div>'
+        +'<div><label class="fl">责任单位<span class="req">*</span></label><input class="inp" id="by-unit" value="'+esc(b.unit||TOWN_NAME)+'"></div>'
+        +'<div><label class="fl">姓名<span class="req">*</span></label><input class="inp" id="by-name" value="'+esc(b.name||'')+'"></div>'
+        +'<div><label class="fl">户籍地</label><input class="inp" id="by-hukou" value="'+esc(b.hukou||'')+'" placeholder="如：向阳堡乡向阳堡村"></div>'
+        +'<div><label class="fl">常住地</label><input class="inp" id="by-residence" value="'+esc(b.residence||'')+'" placeholder="如：平鲁区XX小区"></div>'
+        +'<div><label class="fl">人员类别</label><select class="inp" id="by-cat">'+catOpts+'</select></div>'
+        +'<div><label class="fl">区级包案领导</label><input class="inp" id="by-district" value="'+esc(b.district||'')+'"></div>'
+        +'<div><label class="fl">乡级负责人（书记 / 副书记）</label><input class="inp" id="by-town" value="'+esc(b.town||'')+'"></div>'
+        +'<div><label class="fl">村级负责人（支部书记、村主任 / 网格员）</label><input class="inp" id="by-villageld" value="'+esc(b.villageLd||'')+'"></div>'
+        +'<div><label class="fl">派出所负责人</label><input class="inp" id="by-police" value="'+esc(b.police||'')+'"></div>'
+        +'<div><label class="fl">法律工作者</label><input class="inp" id="by-legal" value="'+esc(b.legal||'')+'"></div>'
+        +'<div class="full"><label class="fl">备注</label><input class="inp" id="by-remark" value="'+esc(b.remark||'')+'"></div>'
+      +'</div>'
+    +'</div>'
+    +'<div class="mf"><button class="btn" data-close="1">取消</button><button class="btn pri" id="by-save">保存</button></div>',true);
+  /* 选择建档人员后自动带出对应字段 */
+  $('by-pick').onchange=function(){
+    var pid=$('by-pick').value;
+    if(!pid)return;
+    var p=findP(pid);if(!p)return;
+    $('by-name').value=p.name||'';
+    $('by-hukou').value=(p.village||'')+((p.address&&p.address.indexOf(p.village||'')!==0)?('　'+p.address):'');
+    $('by-residence').value=p.address||p.village||'';
+    $('by-cat').value=CAT_NAMES.indexOf(p.category)>=0?p.category:'';
+    toast('已带出建档信息，可继续修改','ok');
+  };
+  $('by-save').onclick=function(){
+    var name=$('by-name').value.trim(),unit=$('by-unit').value.trim();
+    if(!name){toast('请填写姓名','err');return}
+    if(!unit){toast('请填写责任单位','err');return}
+    var obj={
+      unit:unit, name:name, personId:$('by-pick').value||'',
+      hukou:$('by-hukou').value.trim(), residence:$('by-residence').value.trim(),
+      category:$('by-cat').value, district:$('by-district').value.trim(),
+      town:$('by-town').value.trim(), villageLd:$('by-villageld').value.trim(),
+      police:$('by-police').value.trim(), legal:$('by-legal').value.trim(),
+      remark:$('by-remark').value.trim()
+    };
+    if(isEdit){
+      var t=findBaoyi(id);if(!t){toast('记录不存在','err');return}
+      Object.keys(obj).forEach(function(k){t[k]=obj[k]});
+      t.updatedAt=nowStr();
+    }else{
+      var nb=newBaoyi(VILLAGES.indexOf(obj.hukou)>=0?obj.hukou:'');
+      Object.keys(obj).forEach(function(k){nb[k]=obj[k]});
+      if(obj.personId){var pp=findP(obj.personId);if(pp)nb.village=pp.village}
+      DB.baoyi.push(nb);
+    }
+    saveDB();closeModal();render();
+    toast(isEdit?'已保存修改':'已新增七包一台账','ok');
+  };
+}
+function bindBaoyi(){
+  bindTopbar();
+  bindPager();
+  $('by-add').onclick=function(){openBaoyiForm(null)};
+  $('by-query').onclick=function(){$('by-filter').classList.toggle('hide')};
+  $('by-deleted').onclick=function(){S.showDeleted=!S.showDeleted;S.page=1;render()};
+  var ok=$('bf-ok');
+  if(ok)ok.onclick=function(){S.baoyiFilter={kw:$('bf-kw').value.trim()};S.page=1;render()};
+  var rs=$('bf-reset');
+  if(rs)rs.onclick=function(){S.baoyiFilter={kw:''};S.page=1;render()};
+  var kw=$('bf-kw');
+  if(kw)kw.onkeydown=function(e){if(e.key==='Enter'&&ok)ok.click()};
+  Array.prototype.forEach.call(document.querySelectorAll('[data-bedit]'),function(b){
+    b.onclick=function(){openBaoyiForm(b.getAttribute('data-bedit'))};
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-bdel]'),function(b){
+    b.onclick=function(){
+      var id=b.getAttribute('data-bdel'),x=findBaoyi(id);if(!x)return;
+      confirmSoftDelete('删除七包一台账',
+        '将删除 <b>'+esc(x.name||'—')+'</b> 的七包一台账记录。',
+        function(note){
+          x.status=0;x.delReason=note;x.delAt=nowStr();
+          saveDB();closeModal();render();
+          toast('已删除该条台账记录','ok');
+        });
+    };
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-brestore]'),function(b){
+    b.onclick=function(){
+      var x=findBaoyi(b.getAttribute('data-brestore'));if(!x)return;
+      x.status=1;x.updatedAt=nowStr();saveDB();render();
+      toast('已恢复该条台账记录','ok');
+    };
+  });
+  bindNotes();
+}
+
+/* ---------------- 视图：数据看板 ---------------- */
+function barRow(label,value,max,color,unit){
+  var w=max>0?Math.round(value/max*100):0;
+  if(value>0&&w<3)w=3;
+  return '<div class="bar"><span class="bl" title="'+esc(label)+'">'+esc(label)+'</span>'
+    +'<span class="bt"><i style="width:'+w+'%;background:'+color+'"></i></span>'
+    +'<span class="bv">'+value+(unit?'<u>'+esc(unit)+'</u>':'')+'</span></div>';
+}
+function donut(parts,size){
+  var tot=0,i;for(i=0;i<parts.length;i++)tot+=parts[i].v;
+  var R=size/2-9, C=2*Math.PI*R, off=0, segs='';
+  parts.forEach(function(p){
+    var len=tot>0?C*(p.v/tot):0;
+    if(len>0){
+      segs+='<circle cx="'+(size/2)+'" cy="'+(size/2)+'" r="'+R+'" fill="none" stroke="'+p.c
+        +'" stroke-width="17" stroke-dasharray="'+len+' '+(C-len)+'" stroke-dashoffset="'+(-off)
+        +'" transform="rotate(-90 '+(size/2)+' '+(size/2)+')"/>';
+    }
+    off+=len;
+  });
+  return '<svg width="'+size+'" height="'+size+'" viewBox="0 0 '+size+' '+size+'">'
+    +'<circle cx="'+(size/2)+'" cy="'+(size/2)+'" r="'+R+'" fill="none" stroke="#f1f4f9" stroke-width="17"/>'
+    +segs
+    +'<text x="'+(size/2)+'" y="'+(size/2-2)+'" text-anchor="middle" font-size="23" font-weight="600" fill="#1e2430">'+tot+'</text>'
+    +'<text x="'+(size/2)+'" y="'+(size/2+16)+'" text-anchor="middle" font-size="11" fill="#939ba8">总人数</text>'
+    +'</svg>';
+}
+function legendOf(parts){
+  var tot=0,i;for(i=0;i<parts.length;i++)tot+=parts[i].v;
+  return '<div class="legend">'+parts.map(function(p){
+    return '<div class="lg"><i style="background:'+p.c+'"></i><span class="n">'+esc(p.n)+'</span>'
+      +'<span class="v">'+p.v+' <u style="color:#939ba8;text-decoration:none">'
+      +(tot>0?Math.round(p.v/tot*100):0)+'%</u></span></div>';
+  }).join('')+'</div>';
+}
+function viewBoard(){
+  var isTown=S.user.lv==='town';
+  var scope=isTown?VILLAGES.slice():[S.user.v];
+  var t=townStat();
+  /* 类别分布 */
+  var catCount={},visitCnt=0,fieldCnt=0,photoCnt=0,secCnt=0,partyCnt=0,aidCnt=0;
+  scope.forEach(function(v){
+    personsOf(v).forEach(function(p){
+      catCount[p.category]=(catCount[p.category]||0)+1;
+      if(p.isSecretary==='是')secCnt++;
+      if(p.political==='中共党员'||p.political==='中共预备党员')partyCnt++;
+      (p.contacts||[]).forEach(function(c){
+        visitCnt++;
+        if(c.method==='实地走访')fieldCnt++;
+        photoCnt+=(c.photos||[]).length;
+      });
+      /* 帮扶记录（含附件照片） */
+      (p.aids||[]).forEach(function(a){
+        aidCnt++;
+        photoCnt+=(a.photos||[]).length;
+      });
+      if(p.photo)photoCnt++;
+    });
+  });
+  var catParts=CAT_NAMES.map(function(n,i){
+    return {n:n,v:catCount[n]||0,c:CHART_COLORS[i%CHART_COLORS.length]};
+  }).filter(function(x){return x.v>0});
+  /* 风险分布（含「未评定」，需求 8 允许风险等级留空） */
+  var r=[0,0,0,0];
+  scope.forEach(function(v){var q=statOf(v);r[0]+=q.r1;r[1]+=q.r2;r[2]+=q.r3;r[3]+=q.r0});
+  var riskParts=[{n:'1 级 · 高风险',v:r[0],c:'#d92d20'},{n:'2 级 · 中风险',v:r[1],c:'#e8a300'},
+    {n:'3 级 · 低风险',v:r[2],c:'#2a7de1'}];
+  if(r[3]>0)riskParts.push({n:'未评定',v:r[3],c:'#9aa4b2'});
+  /* 各村对比 */
+  var rows=scope.map(function(v){var q=statOf(v);return {v:v,q:q}});
+  var maxVet=1;rows.forEach(function(x){if(x.q.veteran>maxVet)maxVet=x.q.veteran});
+  var cmpBars=rows.slice().sort(function(a,b){return b.q.veteran-a.q.veteran})
+    .map(function(x){return barRow(x.v,x.q.veteran,maxVet,'#1652a8','人')}).join('');
+  /* 类别条形（全乡/本村） */
+  var maxCat=1;catParts.forEach(function(p){if(p.v>maxCat)maxCat=p.v});
+  var catBars=catParts.slice().sort(function(a,b){return b.v-a.v})
+    .map(function(p,i){return barRow(p.n,p.v,maxCat,CHART_COLORS[CAT_NAMES.indexOf(p.n)%CHART_COLORS.length],'人')}).join('');
+
+  var head=isTown
+    ?'<div class="stats mt16">'
+      +statCard('全乡建档总数','d-blue',t.total,'人','')
+      +statCard('退役军人','d-blue',t.veteran,'人','veteran')
+      +statCard('重点优抚对象','d-amber',t.key,'人','key')
+      +statCard('两参人员','d-red',t.lc,'人','lc')
+      +statCard('1 级风险','d-red',t.r1,'人','risk1')
+      +statCard('覆盖行政村','d-gray',t.covered+'/21','','')
+     +'</div>'
+    :(function(){var q=statOf(S.user.v);
+      return '<div class="stats mt16">'
+        +statCard('本村建档总数','d-blue',q.total,'人')
+        +statCard('退役军人','d-blue',q.veteran,'人')
+        +statCard('重点优抚对象','d-amber',q.key,'人')
+        +statCard('两参人员','d-red',q.lc,'人')
+        +statCard('党员','d-green',q.party,'人')
+        +statCard('兵支书','d-gray',q.secretary,'人')
+       +'</div>'})();
+
+  return topbar(isTown?'全乡数据看板':(S.user.v+' · 数据看板'))
+    +'<div class="wrap" style="padding-bottom:28px">'
+      +head
+      +(isTown?'<div class="tiny muted3 mt12">点击上方统计卡可跳转到「全乡人员列表」并自动筛选对应人群。</div>':'')
+      +'<div class="panels mt16">'
+        +'<div class="panel"><h3>人员类别分布<span class="more">共 '+catParts.reduce(function(a,b){return a+b.v},0)+' 人</span></h3>'
+          +'<div class="donut-wrap">'+donut(catParts,168)+legendOf(catParts)+'</div></div>'
+        +'<div class="panel"><h3>风险防控等级分布</h3>'
+          +'<div class="donut-wrap">'+donut(riskParts,168)+legendOf(riskParts)+'</div></div>'
+      +'</div>'
+      +'<div class="panels mt16">'
+        +'<div class="panel"><h3>'+(isTown?'各行政村退役军人数量对比':'人员类别明细')+'</h3>'
+          +'<div class="bars">'+(isTown?cmpBars:catBars)+'</div></div>'
+        +'<div class="panel"><h3>常态化联系与走访情况</h3>'
+          +'<div class="bars">'
+            +barRow('联系走访记录',visitCnt,Math.max(visitCnt,1),'#2a7de1','次')
+            +barRow('其中实地走访',fieldCnt,Math.max(visitCnt,1),'#0f9d58','次')
+            +barRow('帮扶记录',aidCnt,Math.max(aidCnt,1),'#7f77dd','条')
+            +barRow('照片总数',photoCnt,Math.max(photoCnt,1),'#c9a227','张')
+            +barRow('党员人数',partyCnt,Math.max(partyCnt,1),'#d92d20','人')
+            +barRow('兵支书',secCnt,Math.max(secCnt,1),'#7f77dd','人')
+          +'</div></div>'
+      +'</div>'
+      +(isTown?'<div class="panel mt16"><h3>各行政村重点优抚对象 / 两参人员对比</h3><div class="panels" style="gap:24px">'
+        +'<div class="bars">'+rows.slice().sort(function(a,b){return b.q.key-a.q.key})
+          .map(function(x){return barRow(x.v,x.q.key,Math.max.apply(null,rows.map(function(y){return y.q.key}))||1,'#c9a227','人')}).join('')+'</div>'
+        +'<div class="bars">'+rows.slice().sort(function(a,b){return b.q.lc-a.q.lc})
+          .map(function(x){return barRow(x.v,x.q.lc,Math.max.apply(null,rows.map(function(y){return y.q.lc}))||1,'#d92d20','人')}).join('')+'</div>'
+        +'</div></div>':'')
+      +noteBox('board','数据看板页面备注','例如：数据统计口径说明、上报时间等')
+    +'</div>';
+}
+function bindBoard(){
+  bindTopbar();
+  /* 需求（看板）：点击统计卡跳转到对应的列表页面，并带上对应筛选 */
+  Array.prototype.forEach.call(document.querySelectorAll('[data-jump]'),function(el){
+    el.onclick=function(){
+      var f=blankFilters();
+      f.flag=el.getAttribute('data-jump')||'';
+      S.filtersAll=f;S.page=1;S.showDeleted=false;
+      S.view='all';render();window.scrollTo(0,0);
+    };
+  });
+  bindNotes();
+}
+
+/* ---------------- 视图：预警记录 ---------------- */
+function viewWarn(){
+  var list=DB.warnings.filter(function(w){return canAccess(w.village)}).slice().reverse();
+  var pend=list.filter(function(w){return !w.handled}).length;
+  var items=list.map(function(w){
+    return '<div class="witem '+(w.handled?'hd':'un')+'">'
+      +'<div class="wh"><b>'+esc(w.village)+' · '+esc(w.name)+'</b>'
+        +'<span class="badge '+(w.handled?'bg':'b1')+'">'+(w.handled?'已处理':'待处理')+'</span>'
+        +'<span class="tiny muted3">发起人 '+esc(w.by||'—')+'</span>'
+        +'<span class="wt">'+esc(w.at)+'</span></div>'
+      +'<div class="tiny muted" style="margin-bottom:7px">发送至 '+esc(w.to)+'　本人电话 '+esc(w.phone)+'</div>'
+      +'<div class="wc">'+esc(w.content)+'</div>'
+      +'<div class="wf">'
+        +(w.handled
+          ? '<div class="wnote">处理备注：'+esc(w.handleNote||'—')+'　<span class="muted3">'+esc(w.handleAt||'')+'</span></div>'
+          : '<button class="btn sm pri" data-hd="'+w.id+'">标记已处理</button>')
+        +(w.personId&&findP(w.personId)?'<button class="btn sm" data-wview="'+w.personId+'">查看人员</button>':'')
+      +'</div>'
+    +'</div>';
+  }).join('');
+  return topbar('预警记录')
+    +'<div class="wrap" style="padding-bottom:28px">'
+      +'<div class="stats mt16">'
+        +statCard('预警总数','d-blue',list.length,'条')
+        +statCard('待处理','d-red',pend,'条')
+        +statCard('已处理','d-green',list.length-pend,'条')
+      +'</div>'
+      +'<div class="mt16 tiny muted3">一键预警所发送的短信记录'+(S.user.lv==='town'?'（全乡）':'（本村）')
+        +'，点击“标记已处理”可登记处置情况。</div>'
+      +'<div class="wlist mt12">'+(items||'<div class="card"><div class="empty">暂无预警记录</div></div>')+'</div>'
+      +noteBox('warn','预警记录页面备注','例如：本批次预警的处置安排、值班交接说明')
+    +'</div>';
+}
+function bindWarn(){
+  bindTopbar();
+  Array.prototype.forEach.call(document.querySelectorAll('[data-hd]'),function(b){
+    b.onclick=function(){
+      var id=b.getAttribute('data-hd');
+      openModal('<div class="mh"><b>标记为已处理</b><div class="spacer"></div><button class="x" data-close="1">✕</button></div>'
+        +'<div class="mb"><div class="tiny muted">请填写本次预警的处置情况，用于留痕。</div>'
+          +'<div class="mt12"><label class="fl">处理备注<span class="req">*</span></label>'
+          +'<textarea class="inp" id="hd-note" rows="3" placeholder="例如：已联系本人核实情况，安排本周上门走访"></textarea></div></div>'
+        +'<div class="mf"><button class="btn" data-close="1">取消</button><button class="btn pri" id="hd-ok">确认</button></div>');
+      $('hd-ok').onclick=function(){
+        var n=$('hd-note').value.trim();
+        if(!n){toast('请填写处理备注','err');return}
+        DB.warnings.forEach(function(w){if(w.id===id){w.handled=true;w.handleNote=n;w.handleAt=nowStr()}});
+        saveDB();closeModal();render();
+        toast('已标记为已处理','ok');
+      };
+    };
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-wview]'),function(b){
+    b.onclick=function(){openDetail(b.getAttribute('data-wview'))};
+  });
+  bindNotes();
+}
+
+/* ---------------- 视图：数据管理 ---------------- */
+function dcard(title,desc,id,btn,danger){
+  return '<div class="dcard"><h4>'+esc(title)+'</h4><p>'+esc(desc)+'</p>'
+    +'<button class="btn'+(danger?' danger':'')+'" id="'+id+'">'+esc(btn)+'</button></div>';
+}
+function viewData(){
+  var all=DB.persons.length, del=DB.persons.filter(function(p){return p.status===0}).length;
+  var size=0;try{size=JSON.stringify(DB).length}catch(e){}
+  var warnCnt=DB.warnings.length;
+  var visitCnt=DB.visits.length, baoyiCnt=DB.baoyi.length;
+  return topbar('数据管理')
+    +'<div class="wrap" style="padding-bottom:28px">'
+      +'<div class="stats mt16">'
+        +statCard('档案总条数','d-blue',all,'条')
+        +statCard('已删除留痕','d-gray',del,'条')
+        +statCard('预警记录','d-red',warnCnt,'条')
+        +statCard('来访诉求','d-amber',visitCnt,'条')
+        +statCard('七包一台账','d-blue',baoyiCnt,'条')
+        +statCard('数据占用','d-green',(size/1024).toFixed(0),'KB')
+      +'</div>'
+      +'<div class="dgrid mt16">'
+        +dcard('导出全部数据（备份）','将当前全部档案、预警记录、来访诉求、七包一台账与页面备注导出为 JSON 备份文件，可用于换机迁移或存档。','data-backup','导出备份文件')
+        +dcard('导入备份恢复','选择此前导出的 JSON 备份文件，覆盖当前数据。','data-restore','选择文件恢复')
+        +dcard('导出全乡人员台账','将全乡 21 个行政村的有效人员信息（不含已删除）导出为 Excel 表格。','data-export-all','导出 Excel')
+        +dcard('清空全部数据','删除全部人员档案、预警记录、来访诉求、七包一台账与页面备注，恢复为空白系统。此操作不可撤销，建议先导出备份。','data-reset','清空数据',true)
+      +'</div>'
+      +'<div class="card mt16" style="padding:14px 16px">'
+        +'<div class="tiny muted" style="line-height:2">'
+          +'<b style="color:#1e2430">说明：</b>本系统为纯前端单文件应用，数据保存在本机浏览器本地存储（localStorage）中，'
+          +'不上传服务器。更换电脑、清理浏览器数据或更换浏览器都会导致数据丢失，建议定期使用「导出全部数据」做备份。<br>'
+          +'当前存储键：<span class="pw">'+esc(STORE_KEY)+'</span>'
+        +'</div>'
+      +'</div>'
+      +noteBox('data','数据管理页面备注','例如：备份时间、备份人、恢复原因')
+    +'</div>';
+}
+function bindData(){
+  bindTopbar();
+  $('data-backup').onclick=function(){
+    var dump={app:'向阳堡乡退役军人服务站信息管理系统',version:1,exportedAt:nowStr(),data:DB};
+    downloadBlob(new Blob([JSON.stringify(dump,null,2)],{type:'application/json'}),'向阳堡乡退役军人数据备份_'+today()+'.json');
+    toast('备份文件已导出','ok');
+  };
+  $('data-restore').onclick=function(){
+    var inp=document.createElement('input');
+    inp.type='file';inp.accept='.json';
+    inp.onchange=function(){
+      var f=inp.files&&inp.files[0];if(!f)return;
+      var r=new FileReader();
+      r.onload=function(e){
+        var obj=null;
+        try{obj=JSON.parse(e.target.result)}catch(err){toast('备份文件解析失败','err');return}
+        var d=obj&&obj.data?obj.data:obj;
+        if(!d||!d.persons||!d.persons.length){toast('备份文件格式不正确','err');return}
+        openModal('<div class="mh"><b>恢复备份确认</b><div class="spacer"></div><button class="x" data-close="1">✕</button></div>'
+          +'<div class="mb"><div style="background:#fdecea;border:1px solid #f3c3bd;border-radius:9px;padding:12px 14px;font-size:13px;color:#a32017">'
+          +'恢复将<b>覆盖</b>当前全部数据（现有 '+DB.persons.length+' 条档案 → 备份中 '+d.persons.length+' 条档案），请确认。</div>'
+          +'<div class="mt16"><label class="fl">恢复备注<span class="req">*</span></label>'
+          +'<textarea class="inp" id="rs-note" rows="2" placeholder="请填写恢复原因（必填）"></textarea></div></div>'
+          +'<div class="mf"><button class="btn" data-close="1">取消</button><button class="btn danger" id="rs-ok">确认恢复</button></div>');
+        $('rs-ok').onclick=function(){
+          var n=$('rs-note').value.trim();
+          if(!n){toast('请填写恢复备注','err');return}
+          DB.persons=d.persons;DB.warnings=d.warnings||[];DB.passwords=d.passwords||{};
+          DB.pageNotes=d.pageNotes||{};DB.visits=d.visits||[];DB.baoyi=d.baoyi||[];
+          normalizeDB();
+          saveDB();closeModal();render();
+          toast('已从备份恢复 '+d.persons.length+' 条档案','ok');
+        };
+      };
+      r.readAsText(f,'utf-8');
+    };
+    inp.click();
+  };
+  $('data-export-all').onclick=function(){
+    var rows=[IMPORT_HEADERS];
+    VILLAGES.forEach(function(v){
+      personsOf(v).forEach(function(p){rows.push(rowOf(p))});
+    });
+    if(rows.length<2){toast('暂无可导出数据','err');return}
+    if(window.XLSX){
+      var ws=XLSX.utils.aoa_to_sheet(rows);
+      ws['!cols']=[{wch:12},{wch:10},{wch:6},{wch:20},{wch:24},{wch:14},{wch:16},{wch:12},{wch:12},{wch:12},{wch:9},{wch:14},{wch:12},{wch:36},{wch:44},{wch:18}];
+      var wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'全乡人员台账');
+      XLSX.writeFile(wb,'向阳堡乡退役军人台账_'+today()+'.xlsx');
+    }else{
+      downloadBlob(new Blob([toCSV(rows)],{type:'text/csv;charset=utf-8'}),'向阳堡乡退役军人台账_'+today()+'.csv');
+    }
+    toast('已导出全乡 '+(rows.length-1)+' 条台账','ok');
+  };
+  $('data-reset').onclick=function(){
+    openModal('<div class="mh"><b>清空数据确认</b><div class="spacer"></div><button class="x" data-close="1">✕</button></div>'
+      +'<div class="mb"><div style="background:#fdecea;border:1px solid #f3c3bd;border-radius:9px;padding:12px 14px;font-size:13px;color:#a32017">'
+      +'此操作将<b>删除全部人员档案、预警记录、来访诉求、七包一台账与页面备注</b>（含修改过的密码），系统恢复为空白状态，<b>不可撤销</b>。建议先「导出全部数据」备份。</div>'
+      +'<div class="mt16"><label class="fl">清空原因<span class="req">*</span></label>'
+      +'<textarea class="inp" id="rz-note" rows="2" placeholder="请填写清空原因（必填）"></textarea></div></div>'
+      +'<div class="mf"><button class="btn" data-close="1">取消</button><button class="btn danger" id="rz-ok">确认清空</button></div>');
+    $('rz-ok').onclick=function(){
+      var n=$('rz-note').value.trim();
+      if(!n){toast('请填写重置备注','err');return}
+      resetDB();closeModal();render();
+      toast('已清空全部数据，系统恢复为空白状态','ok');
+    };
+  };
+  bindNotes();
+}
+
+/* ---------------- 渲染入口 ---------------- */
+function render(){
+  var app=$('app');
+  if(S.view==='login'||!S.user){
+    app.innerHTML=viewLogin();bindLogin();
+    bindModalClose();return;
+  }
+  /* 权限守卫：村级账号不可访问乡级专属页面 */
+  if(S.user.lv!=='town'&&(S.view==='board'||S.view==='data'||S.view==='all'||S.view==='baoyi'))S.view='village';
+  if(S.view==='village'&&!S.village)S.village=(S.user.lv==='town'?VILLAGES[0]:S.user.v);
+  if(S.view==='form'&&!S.editId&&!S.village)S.village=(S.user.lv==='town'?VILLAGES[0]:S.user.v);
+
+  if(S.view==='map'){app.innerHTML=viewMap();bindMap();bindModalClose();return}
+  if(S.view==='village'){app.innerHTML=viewVillage();bindVillage();bindModalClose();return}
+  if(S.view==='all'){app.innerHTML=viewAll();bindAll();bindModalClose();return}
+  if(S.view==='form'){app.innerHTML=viewForm();bindForm();bindModalClose();return}
+  if(S.view==='board'){app.innerHTML=viewBoard();bindBoard();bindModalClose();return}
+  if(S.view==='warn'){app.innerHTML=viewWarn();bindWarn();bindModalClose();return}
+  if(S.view==='visit'){app.innerHTML=viewVisit();bindVisit();bindModalClose();return}
+  if(S.view==='baoyi'){app.innerHTML=viewBaoyi();bindBaoyi();bindModalClose();return}
+  if(S.view==='data'){app.innerHTML=viewData();bindData();bindModalClose();return}
+  S.view='map';app.innerHTML=viewMap();bindMap();bindModalClose();
+}
+function bindModalClose(){
+  Array.prototype.forEach.call(document.querySelectorAll('[data-close]'),function(b){
+    b.onclick=closeModal;
+  });
+  var mask=document.querySelector('[data-mask]');
+  if(mask)mask.onclick=function(e){if(e.target===mask)closeModal()};
+}
+document.addEventListener('click',function(e){
+  var t=e.target;
+  /* 账号下拉：点到别处就收起 */
+  var ac=$('lg-ac');
+  if(ac&&!ac.classList.contains('hide')&&!(t&&t.closest&&t.closest('.ac-wrap')))hideAc();
+  var c=t&&t.closest?t.closest('[data-close]'):null;
+  if(c){closeModal();return}
+  /* 需求 6：所有附件照片点击放大预览（人员照片 / 走访照片 / 帮扶照片） */
+  if(t&&t.tagName==='IMG'&&t.closest&&t.closest('.photos,.frame'))openZoom(t.getAttribute('src'));
+});
+
+/* ---------------- 启动 ---------------- */
+loadDB();
+saveDB();
+render();
+</script>
+</body>
+</html>
