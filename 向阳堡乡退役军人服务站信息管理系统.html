@@ -525,18 +525,21 @@ var MAP_ROADS=[
 ];
 var MAP_GOV=[437.7,503.7];
 
-/* 人员类别：veteran=退役军人，key=重点优抚对象，lc=两参人员 */
+/* 人员类别：veteran=退役军人，key=重点优抚对象，lc=两参人员
+   V3 需求 2：下拉框整表替换为以下 10 项，旧类别全部废弃。
+   口径一：人员类别不属于「退役军士」的，都属于重点优抚对象（key=true）。
+   口径二：两参人员 =「参战退役军人」+「参试退役军人」（lc=true）。 */
 var CATEGORIES = [
-  {n:'退役士兵',        veteran:true,  key:false, lc:false, w:44},
-  {n:'转业士官',        veteran:true,  key:false, lc:false, w:8},
-  {n:'复员军人',        veteran:true,  key:true,  lc:false, w:6},
-  {n:'军队离退休干部',  veteran:true,  key:true,  lc:false, w:2},
-  {n:'残疾军人',        veteran:true,  key:true,  lc:false, w:6},
-  {n:'参战参试人员',    veteran:true,  key:true,  lc:true,  w:9},
-  {n:'烈士遗属',        veteran:false, key:true,  lc:false, w:3},
-  {n:'因公牺牲军人遗属',veteran:false, key:true,  lc:false, w:2},
-  {n:'病故军人遗属',    veteran:false, key:true,  lc:false, w:4},
-  {n:'现役军人家属',    veteran:false, key:false, lc:false, w:16}
+  {n:'退役军士',              veteran:true, key:false, lc:false},
+  {n:'伤残人员',              veteran:true, key:true,  lc:false},
+  {n:'三属',                  veteran:true, key:true,  lc:false},
+  {n:'三红',                  veteran:true, key:true,  lc:false},
+  {n:'在乡复员军人',          veteran:true, key:true,  lc:false},
+  {n:'带病回乡退伍军人',      veteran:true, key:true,  lc:false},
+  {n:'参战退役军人',          veteran:true, key:true,  lc:true},
+  {n:'参试退役军人',          veteran:true, key:true,  lc:true},
+  {n:'60周岁以上农村籍退役士兵',veteran:true, key:true, lc:false},
+  {n:'部分烈士子女',          veteran:true, key:true,  lc:false}
 ];
 var CAT_NAMES = CATEGORIES.map(function(c){return c.n});
 var POLITICAL = ['中共党员','中共预备党员','共青团员','群众','民主党派'];
@@ -742,10 +745,11 @@ function personsOf(v){
   return DB.persons.filter(function(p){return p.village===v&&p.status===1});
 }
 function statOf(v){
-  var ps=personsOf(v),o={total:ps.length,veteran:0,key:0,lc:0,party:0,secretary:0,r0:0,r1:0,r2:0,r3:0};
+  /* V3 需求 1：全乡退役军人数 = 系统人数 = 建档立卡人数，
+     故 veteran 直接取档案总数，不再按人员类别区分。 */
+  var ps=personsOf(v),o={total:ps.length,veteran:ps.length,key:0,lc:0,party:0,secretary:0,r0:0,r1:0,r2:0,r3:0};
   ps.forEach(function(p){
     var c=catOf(p.category);
-    if(c.veteran)o.veteran++;
     if(c.key)o.key++;
     if(c.lc)o.lc++;
     if(p.political==='中共党员'||p.political==='中共预备党员')o.party++;
@@ -2166,8 +2170,8 @@ function doExport(){
 }
 function doTemplate(){
   var rows=[IMPORT_HEADERS,
-    ['向阳堡村','张建军','男','140603197803124517','向阳堡村3组18号','13800138000','退役士兵','中共党员','1998-12-01','2003-12-01','否','三等功','3级','李秀英(配偶,13900139000)；张伟(子,13700137000)','2026-03-12 电话 是 已联系，情况稳定','示例行，导入前请删除'],
-    ['小庄村','王海林','男','140603198511204536','小庄村2组9号','13900139001','参战参试人员','群众','2005-12-01','2010-12-01','否','','2级','刘桂兰(配偶,13600136000)','2026-04-08 实地走访 否 已上门了解情况','']
+    ['向阳堡村','张建军','男','140603197803124517','向阳堡村3组18号','13800138000','退役军士','中共党员','1998-12-01','2003-12-01','否','三等功','3级','李秀英(配偶,13900139000)；张伟(子,13700137000)','2026-03-12 电话 是 已联系，情况稳定','示例行，导入前请删除'],
+    ['小庄村','王海林','男','140603198511204536','小庄村2组9号','13900139001','参战退役军人','群众','2005-12-01','2010-12-01','否','','2级','刘桂兰(配偶,13600136000)','2026-04-08 实地走访 否 已上门了解情况','']
   ];
   if(window.XLSX){
     var ws=XLSX.utils.aoa_to_sheet(rows);
@@ -2252,7 +2256,7 @@ function importRows(aoa){
     np.idCard=String(r[idx['身份证号']]||'').trim();
     np.address=String(r[idx['家庭住址']]||'').trim();
     np.phone=String(r[idx['联系方式']]||'').trim();
-    np.category=CAT_NAMES.indexOf(String(r[idx['人员类别']]||'').trim())>=0?String(r[idx['人员类别']]).trim():'退役士兵';
+    np.category=CAT_NAMES.indexOf(String(r[idx['人员类别']]||'').trim())>=0?String(r[idx['人员类别']]).trim():CAT_NAMES[0];
     np.political=POLITICAL.indexOf(String(r[idx['政治面貌']]||'').trim())>=0?String(r[idx['政治面貌']]).trim():'群众';
     np.enlistDate=String(r[idx['入伍时间']]||'').trim();
     np.dischargeDate=String(r[idx['退伍时间']]||'').trim();
